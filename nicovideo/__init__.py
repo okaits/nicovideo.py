@@ -1,6 +1,6 @@
 """ nicovideo.py (video) """
 
-__version__ = '0.0.1'
+__version__ = '0.0.2'
 
 import pprint
 import urllib.request
