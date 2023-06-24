@@ -25,6 +25,8 @@ class Video():
             def __init__(self, nickname: str, videoid: str):
                 self.nickname: str = nickname
                 self.id      : str = videoid #pylint: disable=C0103
+            def __str__(self):
+                return f'{self.nickname} [ID: {self.id}]'
 
         class Counts():
             """ Counts data """
@@ -33,18 +35,28 @@ class Video():
                 self.likes   : int = likes
                 self.mylists : int = mylists
                 self.views   : int = views
+            def __str__(self):
+                returndata = f'Comments: {self.comments}\n'
+                returndata += f'Likes: {self.likes}\n'
+                returndata += f'Mylists: {self.mylists}\n'
+                returndata += f'Views: {self.views}'
+                return returndata
 
         class Genre():
             """ Genre data """
             def __init__(self, label, key):
                 self.label   : str = label
                 self.key     : str = key
+            def __str__(self):
+                return self.label
 
         class Tag():
             """ Tag data """
             def __init__(self, name: str, locked: bool):
                 self.name  : str  = name
                 self.locked: bool = locked
+            def __str__(self):
+                return f'{self.name}{" [Locked]" if self.locked else ""}'
 
         def __init__(
                 self,
