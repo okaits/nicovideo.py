@@ -36,10 +36,10 @@ class Video():
                 self.mylists : int = mylists
                 self.views   : int = views
             def __str__(self):
-                returndata = f'Comments: {self.comments}\n'
-                returndata += f'Likes: {self.likes}\n'
+                returndata = f'Views: {self.views}\n'
+                returndata += f'Comments: {self.comments}\n'
                 returndata += f'Mylists: {self.mylists}\n'
-                returndata += f'Views: {self.views}'
+                returndata += f'Likes: {self.likes}'
                 return returndata
 
         class Genre():
