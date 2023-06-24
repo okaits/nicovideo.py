@@ -85,7 +85,9 @@ class Video():
             text = response.read()
 
         soup = bs(text, "html.parser")
-        self.rawdict = json5.loads(str(soup.find("div", id="js-initial-watch-data")["data-api-data"]))
+        self.rawdict = json5.loads(
+            str(soup.find("div", id="js-initial-watch-data")["data-api-data"])
+        )
 
         # Tags
         tags = []
