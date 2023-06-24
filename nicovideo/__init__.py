@@ -1,5 +1,7 @@
 """ nicovideo.py (video) """
 
+__version__ = '0.0.1'
+
 import pprint
 import urllib.request
 from html import unescape
