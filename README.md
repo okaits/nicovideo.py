@@ -20,7 +20,7 @@ metadata = video.get_metadata()
 ```
 
 ## クラス・関数やその返り値など
-### class Video
+### `class Video(videoid: str = 動画ID) -> Video`
 動画のクラスです。  
   
 インスタンス変数一覧:
@@ -29,10 +29,10 @@ videoid: str = 動画ID
 rawdict: dict = 取得した生データ（Video.get_metadataを実行するまではNone）
 ```
 
-#### def Video.get_metadata() -> Video.Metadata
+#### `def Video.get_metadata() -> Video.Metadata`
 動画のメタデータを取得するメソッドです。
 
-#### class Video.Metadata
+#### `class Video.Metadata(長すぎるので省略) -> Video.Metadata`
 動画のメタデータのクラスです。   
 
 インスタンス変数一覧:
@@ -47,7 +47,7 @@ genre: Video.Metadata.Genre = ジャンル
 tags: list[Video.Metadata.Tag] = タグ一覧
 ```
 
-##### class Video.Metadata.User
+##### `class Video.Metadata.User(nickname: str = ユーザーのニックネーム, id: str = ユーザーID) -> Video.Metadata.User`
 ユーザーのクラスです。投稿者などを表します。  
   
 インスタンス変数一覧:
@@ -56,7 +56,7 @@ nickname: str = ユーザーニックネーム
 id: int = ユーザーID
 ```
 
-##### class Video.Metadata.Counts
+##### `class Video.Metadata.Counts(comments: int = コメント数, likes: int = いいね！数, mylists: int = マイリス数, views: id = 再生数) -> Video.Metadata.Counts`
 各種カウンターのクラスです。再生数などのカウンターを表します。  
   
 インスタンス変数一覧:
@@ -67,7 +67,7 @@ mylists: int = マイリスト数
 views: int = 再生数
 ```
 
-##### class Video.Metadata.Genre
+##### `class Video.Metadata.Genre(label: str = ジャンル名, key: ジャンルの内部キー) -> Video.Metadata.Genre`
 ジャンルのクラスです。  
   
 インスタンス変数一覧:
@@ -76,7 +76,7 @@ label: str = ジャンル名
 key: str = 内部識別キー
 ```
 
-##### class Video.Metadata.Tag
+##### `class Video.Metadata.Tag(name: str = タグ名, locked: bool = タグロック) -> Video.Metadata.Tag`
 タグのクラスです。  
   
 インスタンス変数一覧:
