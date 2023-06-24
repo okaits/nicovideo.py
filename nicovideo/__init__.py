@@ -22,9 +22,9 @@ class Video():
 
         class User():
             """ User data """
-            def __init__(self, nickname: str, videoid: str):
+            def __init__(self, nickname: str, id: str):
                 self.nickname: str = nickname
-                self.id      : str = videoid #pylint: disable=C0103
+                self.id      : str = id #pylint: disable=C0103
             def __str__(self):
                 return f'{self.nickname} [ID: {self.id}]'
 
@@ -104,7 +104,7 @@ class Video():
             title    = self.rawdict['video']['title'],
             owner    = self.Metadata.User(
                         nickname = self.rawdict['owner']['nickname'],
-                        videoid  = self.rawdict['owner']['id']
+                        id  = self.rawdict['owner']['id']
                        ),
             counts   = self.Metadata.Counts(
                         comments = self.rawdict['video']['count']['comment'],
