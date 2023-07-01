@@ -4,6 +4,7 @@ from __future__ import annotations
 import datetime
 import pprint
 import urllib.request
+import urllib.error
 from html import unescape
 from typing import Type, Union
 
@@ -11,6 +12,15 @@ import json5
 from bs4 import BeautifulSoup as bs
 
 __version__ = '0.0.5'
+
+class Error():
+    """ Errors """
+    class NicovideoClientError(Exception):
+        """ urllib error """
+        class VideoNotFound(Exception):
+            """ Video not found or deleted """
+        class ConnectionError(Exception):
+            """ Connection error """
 
 class Video():
     """ Video """
@@ -161,8 +171,13 @@ class Video():
     def get_metadata(self) -> Video.Metadata:
         """ Get video's metadata """
         watch_url = f"https://www.nicovideo.jp/watch/{self.videoid}"
-        with urllib.request.urlopen(watch_url) as response:
-            text = response.read()
+        try:
+            with urllib.request.urlopen(watch_url) as response:
+                text = response.read()
+        except urllib.error.HTTPError as exc:
+            raise Error.NicovideoClientError.VideoNotFound("Video not found or deleted.") from exc
+        except urllib.error.URLError as exc:
+            raise Error.NicovideoClientError.ConnectionError("Connection error.") from exc
 
         soup = bs(text, "html.parser")
         self.rawdict = json5.loads(
