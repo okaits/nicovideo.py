@@ -5,7 +5,7 @@ import datetime
 import pprint
 import urllib.request
 from html import unescape
-from typing import Type
+from typing import Type, Union
 
 import json5
 from bs4 import BeautifulSoup as bs
@@ -93,6 +93,26 @@ class Video():
                 self.genreranking = genreranking
                 self.tagrankings  = tagrankings
 
+        class Series():
+            """ Series data """
+            def __init__(
+                    self,
+                    seriesid   : int,
+                    title      : str,
+                    description: str,
+                    thumbnail  : str,
+                    prev_video : Union[Video, type(None)] = None,
+                    next_video : Union[Video, type(None)] = None,
+                    first_video: Union[Video, type(None)] = None
+                    ) -> Video.Metadata.Series:
+                self.id          = seriesid #pylint: disable=C0103
+                self.title       = title
+                self.description = description
+                self.thumbnail   = thumbnail
+                self.prev_video  = prev_video
+                self.next_video  = next_video
+                self.first_video = first_video
+
         def __init__(
                 self,
                 videoid : str,
@@ -103,7 +123,8 @@ class Video():
                 postdate: datetime.datetime,
                 genre   : Genre,
                 tags    : list[Tag],
-                ranking : Ranking
+                ranking : Ranking,
+                series  : Series
                 ) -> Video.Metadata:
             self.videoid  : str               = videoid #pylint: disable=C0103
             self.title    : str               = title
@@ -114,6 +135,7 @@ class Video():
             self.genre    : self.Genre        = genre
             self.tags     : list[self.Tag]    = tags
             self.ranking  : self.Ranking      = ranking
+            self.series   : self.Series       = series
             self.url      : str               = f'https://www.nicovideo.jp/watch/{videoid}'
 
     def get_metadata(self) -> Video.Metadata:
@@ -156,7 +178,7 @@ class Video():
             datetime.datetime.fromisoformat(self.rawdict['ranking']['genre']['dateTime'])
         )
 
-        return self.Metadata(
+        data = self.Metadata(
             videoid  = self.rawdict['video']['id'],
             title    = self.rawdict['video']['title'],
             owner    = self.Metadata.User(
@@ -178,5 +200,18 @@ class Video():
                         key      = self.rawdict['genre']['key']
                        ),
             ranking  = self.Metadata.Ranking(ranking_genre, ranking_tags),
+            series   = self.Metadata.Series(
+                        seriesid = self.rawdict['series']['id'],
+                        title = self.rawdict['series']['title'],
+                        description= self.rawdict['series']['description'],
+                        thumbnail = self.rawdict['series']['thumbnailUrl'],
+                        prev_video = Video(self.rawdict['series']['video']['prev']['id'])
+                            if self.rawdict['series']['video']['prev'] else None,
+                        next_video = Video(self.rawdict['series']['video']['next']['id'])
+                            if self.rawdict['series']['video']['next'] else None,
+                        first_video = Video(self.rawdict['series']['video']['first']['id'])
+                            if self.rawdict['series']['video']['first'] else None
+            ),
             tags     = tags
         )
+        return data
