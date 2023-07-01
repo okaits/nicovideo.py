@@ -60,6 +60,39 @@ class Video():
             def __str__(self):
                 return f'{self.name}{" [Locked]" if self.locked else ""}'
 
+        class Ranking():
+            """ Ranking data """
+            class Genre():
+                """ Genre ranking data """
+                def __init__(
+                        self,
+                        genre: Video.Metadata.Genre,
+                        rank : int,
+                        time : datetime.datetime
+                        ) -> Video.Metadata.Ranking.Genre:
+                    self.genre = genre
+                    self.rank  = rank
+                    self.time  = time
+            class Tag():
+                """ Tag ranking data """
+                def __init__(
+                        self,
+                        tag : Video.Metadata.Tag,
+                        rank: int,
+                        time: datetime.datetime
+                        ) -> Video.Metadata.Ranking.Tag:
+                    self.tag  = tag
+                    self.rank = rank
+                    self.time = time
+
+            def __init__(
+                    self,
+                    genreranking: Video.Metadata.Ranking.Genre,
+                    tagrankings: list[Video.Metadata.Ranking.Genre]
+                    ) -> Video.Metadata.Ranking:
+                self.genreranking = genreranking
+                self.tagrankings  = tagrankings
+
         def __init__(
                 self,
                 videoid : str,
@@ -69,7 +102,8 @@ class Video():
                 duration: int,
                 postdate: datetime.datetime,
                 genre   : Genre,
-                tags    : list[Tag]
+                tags    : list[Tag],
+                ranking : Ranking
                 ) -> Video.Metadata:
             self.videoid  : str               = videoid #pylint: disable=C0103
             self.title    : str               = title
@@ -79,6 +113,7 @@ class Video():
             self.postdate : datetime.datetime = postdate
             self.genre    : self.Genre        = genre
             self.tags     : list[self.Tag]    = tags
+            self.ranking  : self.Ranking      = ranking
             self.url      : str               = f'https://www.nicovideo.jp/watch/{videoid}'
 
     def get_metadata(self) -> Video.Metadata:
@@ -102,6 +137,25 @@ class Video():
                 )
             )
 
+        # Ranking
+        ranking_tags = []
+        for ranking_tag in self.rawdict['ranking']['popularTag']:
+            for tag in tags:
+                if tag.name == ranking_tag['tag']:
+                    ranking_tags.append(
+                        self.Metadata.Ranking.Tag(
+                            tag,
+                            ranking_tag['rank'],
+                            datetime.datetime.fromisoformat(ranking_tag['dateTime'])
+                        )
+                    )
+                    break
+        ranking_genre = self.Metadata.Ranking.Genre(
+            self.rawdict['ranking']['genre']['genre'],
+            self.rawdict['ranking']['genre']['rank'] ,
+            datetime.datetime.fromisoformat(self.rawdict['ranking']['genre']['dateTime'])
+        )
+
         return self.Metadata(
             videoid  = self.rawdict['video']['id'],
             title    = self.rawdict['video']['title'],
@@ -123,5 +177,6 @@ class Video():
                         label    = self.rawdict['genre']['label'],
                         key      = self.rawdict['genre']['key']
                        ),
+            ranking  = self.Metadata.Ranking(ranking_genre, ranking_tags),
             tags     = tags
         )
