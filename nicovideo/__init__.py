@@ -15,7 +15,7 @@ __version__ = '0.0.4'
 class Video():
     """ Video """
     def __init__(self, videoid: str) -> Video:
-        self.videoid       = videoid
+        self.videoid: str  = videoid
         self.rawdict: dict = {}
 
     class Metadata():
@@ -70,9 +70,9 @@ class Video():
                         rank : int,
                         time : datetime.datetime
                         ) -> Video.Metadata.Ranking.Genre:
-                    self.genre = genre
-                    self.rank  = rank
-                    self.time  = time
+                    self.genre: Video.Metadata.Genre = genre
+                    self.rank : int                  = rank
+                    self.time : datetime.datetime    = time
             class Tag():
                 """ Tag ranking data """
                 def __init__(
@@ -81,17 +81,17 @@ class Video():
                         rank: int,
                         time: datetime.datetime
                         ) -> Video.Metadata.Ranking.Tag:
-                    self.tag  = tag
-                    self.rank = rank
-                    self.time = time
+                    self.tag : Video.Metadata.Tag  = tag
+                    self.rank: int                 = rank
+                    self.time: datetime.datetime   = time
 
             def __init__(
                     self,
                     genreranking: Video.Metadata.Ranking.Genre,
-                    tagrankings: list[Video.Metadata.Ranking.Genre]
+                    tagrankings: list[Video.Metadata.Ranking.Tag]
                     ) -> Video.Metadata.Ranking:
-                self.genreranking = genreranking
-                self.tagrankings  = tagrankings
+                self.genreranking: Video.Metadata.Ranking.Genre       = genreranking
+                self.tagrankings : list[Video.Metadata.Ranking.Genre] = tagrankings
 
         class Series():
             """ Series data """
@@ -105,13 +105,13 @@ class Video():
                     next_video : Union[Video, type(None)] = None,
                     first_video: Union[Video, type(None)] = None
                     ) -> Video.Metadata.Series:
-                self.id          = seriesid #pylint: disable=C0103
-                self.title       = title
-                self.description = description
-                self.thumbnail   = thumbnail
-                self.prev_video  = prev_video
-                self.next_video  = next_video
-                self.first_video = first_video
+                self.id         : int                      = seriesid #pylint: disable=C0103
+                self.title      : str                      = title
+                self.description: str                      = description
+                self.thumbnail  : str                      = thumbnail
+                self.prev_video : Union[Video, type(None)] = prev_video
+                self.next_video : Union[Video, type(None)] = next_video
+                self.first_video: Union[Video, type(None)] = first_video
 
         class Thumbnail():
             """ Thumbnail data """
@@ -123,11 +123,11 @@ class Video():
                     player_url: Union[str, type(None)],
                     ogp_url   : Union[str, type(None)]
                     ) -> Video.Metadata.Thumbnail:
-                self.small_url  = small_url
-                self.middle_url = middle_url
-                self.large_url  = large_url
-                self.player_url = player_url
-                self.ogp_url    = ogp_url
+                self.small_url : Union[str, type(None)] = small_url
+                self.middle_url: Union[str, type(None)] = middle_url
+                self.large_url : Union[str, type(None)] = large_url
+                self.player_url: Union[str, type(None)] = player_url
+                self.ogp_url   : Union[str, type(None)] = ogp_url
 
         def __init__(
                 self,
