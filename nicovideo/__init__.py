@@ -10,7 +10,7 @@ from typing import Type
 import json5
 from bs4 import BeautifulSoup as bs
 
-__version__ = '0.0.3'
+__version__ = '0.0.4'
 
 class Video():
     """ Video """
