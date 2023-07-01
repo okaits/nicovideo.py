@@ -3,3 +3,6 @@ build
 dist
 *.egg-info
 .gitignore
+fordebug.py
+.vscode
+fordebug-data.json
