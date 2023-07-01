@@ -113,6 +113,22 @@ class Video():
                 self.next_video  = next_video
                 self.first_video = first_video
 
+        class Thumbnail():
+            """ Thumbnail data """
+            def __init__(
+                    self,
+                    small_url : Union[str, type(None)],
+                    middle_url: Union[str, type(None)],
+                    large_url : Union[str, type(None)],
+                    player_url: Union[str, type(None)],
+                    ogp_url   : Union[str, type(None)]
+                    ) -> Video.Metadata.Thumbnail:
+                self.small_url  = small_url
+                self.middle_url = middle_url
+                self.large_url  = large_url
+                self.player_url = player_url
+                self.ogp_url    = ogp_url
+
         def __init__(
                 self,
                 videoid    : str,
@@ -125,7 +141,8 @@ class Video():
                 genre      : Genre,
                 tags       : list[Tag],
                 ranking    : Ranking,
-                series     : Series
+                series     : Series,
+                thumbnail  : Thumbnail
                 ) -> Video.Metadata:
             self.videoid    : str               = videoid #pylint: disable=C0103
             self.title      : str               = title
@@ -138,6 +155,7 @@ class Video():
             self.tags       : list[self.Tag]    = tags
             self.ranking    : self.Ranking      = ranking
             self.series     : self.Series       = series
+            self.thumbnail  : self.Thumbnail    = thumbnail
             self.url        : str               = f'https://www.nicovideo.jp/watch/{videoid}'
 
     def get_metadata(self) -> Video.Metadata:
@@ -215,6 +233,13 @@ class Video():
                            first_video = Video(self.rawdict['series']['video']['first']['id'])
                                if self.rawdict['series']['video']['first'] else None
                ),
+            thumbnail   = self.Metadata.Thumbnail(
+                           small_url  = self.rawdict['video']['thumbnail']['url'],
+                           middle_url = self.rawdict['video']['thumbnail']['middleUrl'],
+                           large_url  = self.rawdict['video']['thumbnail']['largeUrl'],
+                           player_url = self.rawdict['video']['thumbnail']['player'],
+                           ogp_url    = self.rawdict['video']['thumbnail']['ogp']
+                ),
             tags        = tags
         )
         return data
