@@ -79,6 +79,7 @@ class Video():
             self.postdate : datetime.datetime = postdate
             self.genre    : self.Genre        = genre
             self.tags     : list[self.Tag]    = tags
+            self.url      : str               = f'https://www.nicovideo.jp/watch/{videoid}'
 
     def get_metadata(self) -> Video.Metadata:
         """ Get video's metadata """
