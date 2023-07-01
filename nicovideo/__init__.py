@@ -97,11 +97,11 @@ class Video():
 
             def __init__(
                     self,
-                    genreranking: Video.Metadata.Ranking.Genre,
+                    genreranking: Union[Video.Metadata.Ranking.Genre, None],
                     tagrankings: list[Video.Metadata.Ranking.Tag]
                     ) -> Video.Metadata.Ranking:
-                self.genreranking: Video.Metadata.Ranking.Genre       = genreranking
-                self.tagrankings : list[Video.Metadata.Ranking.Genre] = tagrankings
+                self.genreranking: Union[Video.Metadata.Ranking.Genre, None] = genreranking
+                self.tagrankings : list[Video.Metadata.Ranking.Genre]        = tagrankings
 
         class Series():
             """ Series data """
@@ -148,25 +148,26 @@ class Video():
                 counts     : Counts,
                 duration   : int,
                 postdate   : datetime.datetime,
-                genre      : Genre,
+                genre      : Union[Genre, type(None)],
                 tags       : list[Tag],
                 ranking    : Ranking,
                 series     : Series,
                 thumbnail  : Thumbnail
                 ) -> Video.Metadata:
-            self.videoid    : str               = videoid #pylint: disable=C0103
-            self.title      : str               = title
-            self.description: str               = description
-            self.owner      : self.User         = owner
-            self.counts     : self.Counts       = counts
-            self.duration   : int               = duration
-            self.postdate   : datetime.datetime = postdate
-            self.genre      : self.Genre        = genre
-            self.tags       : list[self.Tag]    = tags
-            self.ranking    : self.Ranking      = ranking
-            self.series     : self.Series       = series
-            self.thumbnail  : self.Thumbnail    = thumbnail
-            self.url        : str               = f'https://www.nicovideo.jp/watch/{videoid}'
+            self.videoid    : str                           = videoid #pylint: disable=C0103
+            self.title      : str                           = title
+            self.description: str                           = description
+            self.owner      : self.User                     = owner
+            self.counts     : self.Counts                   = counts
+            self.duration   : int                           = duration
+            self.postdate   : datetime.datetime             = postdate
+            self.genre      : Union[self.Genre, type(None)] = genre
+            self.tags       : list[self.Tag]                = tags
+            self.ranking    : self.Ranking                  = ranking
+            self.series     : self.Series                   = series
+            self.thumbnail  : self.Thumbnail                = thumbnail
+            self.url        : str                           = \
+                f'https://www.nicovideo.jp/watch/{videoid}'
 
     def get_metadata(self) -> Video.Metadata:
         """ Get video's metadata """
@@ -175,7 +176,13 @@ class Video():
             with urllib.request.urlopen(watch_url) as response:
                 text = response.read()
         except urllib.error.HTTPError as exc:
-            raise Error.NicovideoClientError.VideoNotFound("Video not found or deleted.") from exc
+            if exc.code == 404:
+                raise Error.NicovideoClientError.VideoNotFound("Video not found or deleted.")\
+                    from exc
+            else:
+                raise Error.NicovideoClientError.ConnectionError(
+                    f"Unexpected HTTP Error: {exc.code}"
+                ) from exc
         except urllib.error.URLError as exc:
             raise Error.NicovideoClientError.ConnectionError("Connection error.") from exc
 
@@ -211,7 +218,7 @@ class Video():
             self.rawdict['ranking']['genre']['genre'],
             self.rawdict['ranking']['genre']['rank'] ,
             datetime.datetime.fromisoformat(self.rawdict['ranking']['genre']['dateTime'])
-        )
+        ) if self.rawdict['ranking']['genre'] else None
 
         data = self.Metadata(
             videoid     = self.rawdict['video']['id'],
@@ -247,7 +254,7 @@ class Video():
                                if self.rawdict['series']['video']['next'] else None,
                            first_video = Video(self.rawdict['series']['video']['first']['id'])
                                if self.rawdict['series']['video']['first'] else None
-               ),
+               ) if self.rawdict['series'] else None,
             thumbnail   = self.Metadata.Thumbnail(
                            small_url  = self.rawdict['video']['thumbnail']['url'],
                            middle_url = self.rawdict['video']['thumbnail']['middleUrl'],
