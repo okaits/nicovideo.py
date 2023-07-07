@@ -3,8 +3,9 @@ from __future__ import annotations
 
 import datetime
 import pprint
-import urllib.request
 import urllib.error
+import urllib.request
+from functools import cache
 from html import unescape
 from typing import Type, Union
 
@@ -21,6 +22,11 @@ class Error():
             """ Video not found or deleted """
         class ConnectionError(Exception):
             """ Connection error """
+
+@cache
+def _urllib_request_with_cache(url: str) -> str:
+    with urllib.request.urlopen(url) as response:
+        return response.read()
 
 class Video():
     """ Video """
@@ -169,12 +175,16 @@ class Video():
             self.url        : str                           = \
                 f'https://www.nicovideo.jp/watch/{videoid}'
 
-    def get_metadata(self) -> Video.Metadata:
+    def get_metadata(self, use_cache: bool = False) -> Video.Metadata:
         """ Get video's metadata """
         watch_url = f"https://www.nicovideo.jp/watch/{self.videoid}"
         try:
-            with urllib.request.urlopen(watch_url) as response:
-                text = response.read()
+            if use_cache:
+                text = _urllib_request_with_cache(watch_url)
+                print(_urllib_request_with_cache.cache_info())
+            else:
+                with urllib.request.urlopen(watch_url) as response:
+                    text = response.read()
         except urllib.error.HTTPError as exc:
             if exc.code == 404:
                 raise Error.NicovideoClientError.VideoNotFound("Video not found or deleted.")\
