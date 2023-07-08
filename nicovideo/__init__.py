@@ -181,7 +181,6 @@ class Video():
         try:
             if use_cache:
                 text = _urllib_request_with_cache(watch_url)
-                print(_urllib_request_with_cache.cache_info())
             else:
                 with urllib.request.urlopen(watch_url) as response:
                     text = response.read()
