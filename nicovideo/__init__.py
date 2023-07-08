@@ -12,7 +12,7 @@ from typing import Type, Union
 import json5
 from bs4 import BeautifulSoup as bs
 
-__version__ = '0.0.6'
+__version__ = '0.0.7'
 
 class Error():
     """ Errors """
