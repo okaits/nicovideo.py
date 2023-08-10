@@ -8,6 +8,7 @@ import urllib.request
 from functools import cache
 from html import unescape
 from typing import Type, Union
+from dataclasses import dataclass
 
 import json5
 from bs4 import BeautifulSoup as bs
@@ -28,152 +29,97 @@ def _urllib_request_with_cache(url: str) -> str:
     with urllib.request.urlopen(url) as response:
         return response.read()
 
+@dataclass
 class Video():
     """ Video """
-    def __init__(self, videoid: str) -> Video:
-        self.videoid: str  = videoid
+    videoid: str
+
+    def __post_init__(self):
         self.rawdict: dict = {}
 
-    class Metadata():
+    @dataclass
+    class Metadata(): # pylint: disable=R0902
         """ Meta data """
+        videoid    : str
+        title      : str
+        description: str
+        owner      : Video.Metadata.User
+        counts     : Video.Metadata.Counts
+        duration   : int
+        postdate   : datetime.datetime
+        genre      : Union[Video.Metadata.Genre, type(None)]
+        tags       : list[Video.Metadata.Tag]
+        ranking    : Video.Metadata.Ranking
+        series     : Video.Metadata.Series
+        thumbnail  : Video.Metadata.Thumbnail
 
+        def __post_init__(self):
+            self.url: str = f'https://www.nicovideo.jp/watch/{self.videoid}'
+
+        @dataclass
         class User():
             """ User data """
-            def __init__(self, nickname: str, userid: str) -> Video.Metadata.User:
-                self.nickname: str = nickname
-                self.id      : str = userid #pylint: disable=C0103
-            def __str__(self) -> str:
-                return f'{self.nickname} [ID: {self.id}]'
+            nickname: str
+            userid  : str
 
+        @dataclass
         class Counts():
             """ Counts data """
-            def __init__(self, comments: int, likes: int, mylists: int, views: int)\
-                    -> Video.Metadata.Counts:
-                self.comments: int = comments
-                self.likes   : int = likes
-                self.mylists : int = mylists
-                self.views   : int = views
-            def __str__(self) -> str:
-                returndata = f'Views: {self.views}\n'
-                returndata += f'Comments: {self.comments}\n'
-                returndata += f'Mylists: {self.mylists}\n'
-                returndata += f'Likes: {self.likes}'
-                return returndata
+            comments: int
+            likes   : int
+            mylists : int
+            views   : int
 
+        @dataclass
         class Genre():
             """ Genre data """
-            def __init__(self, label: str, key: str) -> Video.Metadata.Genre:
-                self.label   : str = label
-                self.key     : str = key
-            def __str__(self):
-                return self.label
+            label   : str
+            key     : str
 
+        @dataclass
         class Tag():
             """ Tag data """
-            def __init__(self, name: str, locked: bool) -> Video.Metadata.Tag:
-                self.name  : str  = name
-                self.locked: bool = locked
-            def __str__(self):
-                return f'{self.name}{" [Locked]" if self.locked else ""}'
+            name  : str
+            locked: bool
 
+        @dataclass
         class Ranking():
             """ Ranking data """
+            genreranking: Union[Video.Metadata.Ranking.Genre, None]
+            tagrankings : list[Video.Metadata.Ranking.Genre]
+
+            @dataclass
             class Genre():
                 """ Genre ranking data """
-                def __init__(
-                        self,
-                        genre: Video.Metadata.Genre,
-                        rank : int,
-                        time : datetime.datetime
-                        ) -> Video.Metadata.Ranking.Genre:
-                    self.genre: Video.Metadata.Genre = genre
-                    self.rank : int                  = rank
-                    self.time : datetime.datetime    = time
+                genre: Video.Metadata.Genre
+                rank : int
+                time : datetime.datetime
+            @dataclass
             class Tag():
                 """ Tag ranking data """
-                def __init__(
-                        self,
-                        tag : Video.Metadata.Tag,
-                        rank: int,
-                        time: datetime.datetime
-                        ) -> Video.Metadata.Ranking.Tag:
-                    self.tag : Video.Metadata.Tag  = tag
-                    self.rank: int                 = rank
-                    self.time: datetime.datetime   = time
+                tag : Video.Metadata.Tag
+                rank: int
+                time: datetime.datetime
 
-            def __init__(
-                    self,
-                    genreranking: Union[Video.Metadata.Ranking.Genre, None],
-                    tagrankings: list[Video.Metadata.Ranking.Tag]
-                    ) -> Video.Metadata.Ranking:
-                self.genreranking: Union[Video.Metadata.Ranking.Genre, None] = genreranking
-                self.tagrankings : list[Video.Metadata.Ranking.Genre]        = tagrankings
-
+        @dataclass
         class Series():
             """ Series data """
-            def __init__(
-                    self,
-                    seriesid   : int,
-                    title      : str,
-                    description: str,
-                    thumbnail  : str,
-                    prev_video : Union[Video, type(None)] = None,
-                    next_video : Union[Video, type(None)] = None,
-                    first_video: Union[Video, type(None)] = None
-                    ) -> Video.Metadata.Series:
-                self.id         : int                      = seriesid #pylint: disable=C0103
-                self.title      : str                      = title
-                self.description: str                      = description
-                self.thumbnail  : str                      = thumbnail
-                self.prev_video : Union[Video, type(None)] = prev_video
-                self.next_video : Union[Video, type(None)] = next_video
-                self.first_video: Union[Video, type(None)] = first_video
+            seriesid   : int
+            title      : str
+            description: str
+            thumbnail  : str
+            prev_video : Union[Video, type(None)]
+            next_video : Union[Video, type(None)]
+            first_video: Union[Video, type(None)]
 
+        @dataclass
         class Thumbnail():
             """ Thumbnail data """
-            def __init__(
-                    self,
-                    small_url : Union[str, type(None)],
-                    middle_url: Union[str, type(None)],
-                    large_url : Union[str, type(None)],
-                    player_url: Union[str, type(None)],
-                    ogp_url   : Union[str, type(None)]
-                    ) -> Video.Metadata.Thumbnail:
-                self.small_url : Union[str, type(None)] = small_url
-                self.middle_url: Union[str, type(None)] = middle_url
-                self.large_url : Union[str, type(None)] = large_url
-                self.player_url: Union[str, type(None)] = player_url
-                self.ogp_url   : Union[str, type(None)] = ogp_url
-
-        def __init__(
-                self,
-                videoid    : str,
-                title      : str,
-                description: str,
-                owner      : User,
-                counts     : Counts,
-                duration   : int,
-                postdate   : datetime.datetime,
-                genre      : Union[Genre, type(None)],
-                tags       : list[Tag],
-                ranking    : Ranking,
-                series     : Series,
-                thumbnail  : Thumbnail
-                ) -> Video.Metadata:
-            self.videoid    : str                           = videoid #pylint: disable=C0103
-            self.title      : str                           = title
-            self.description: str                           = description
-            self.owner      : self.User                     = owner
-            self.counts     : self.Counts                   = counts
-            self.duration   : int                           = duration
-            self.postdate   : datetime.datetime             = postdate
-            self.genre      : Union[self.Genre, type(None)] = genre
-            self.tags       : list[self.Tag]                = tags
-            self.ranking    : self.Ranking                  = ranking
-            self.series     : self.Series                   = series
-            self.thumbnail  : self.Thumbnail                = thumbnail
-            self.url        : str                           = \
-                f'https://www.nicovideo.jp/watch/{videoid}'
+            small_url : Union[str, type(None)]
+            middle_url: Union[str, type(None)]
+            large_url : Union[str, type(None)]
+            player_url: Union[str, type(None)]
+            ogp_url   : Union[str, type(None)]
 
     def get_metadata(self, use_cache: bool = False) -> Video.Metadata:
         """ Get video's metadata """
