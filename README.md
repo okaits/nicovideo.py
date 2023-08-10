@@ -16,121 +16,138 @@ python3 -m pip install -r requirements.txt
 ```python3
 import nicovideo
 video = nicovideo.Video('動画ID')
-metadata = video.get_metadata()
+metadata = video.get_metadata()['data']
 ```
 
 ## クラス・関数やその返り値など
-### `class Video(videoid: str = 動画ID) -> Video`
-動画のクラスです。  
+凡例:  
+`class クラス名(初期化時の引数: 型ヒント = デフォルト値, ...)`  
+`def   関数名(引数: 型ヒント = デフォルト値, ...) -> 返り値型ヒント`
+
+### `class Video(videoid: str = 動画ID)`
+動画のクラスです。このクラス以外はすべて`get_metadata()`が管理するので、基本的にはこのクラス以外を扱う必要はありません。  
   
 インスタンス変数一覧:
 ```
 videoid: str = 動画ID
-rawdict: dict = 取得した生データ（Video.get_metadataを実行するまではNone）
 ```
 
-#### `def Video.get_metadata() -> Video.Metadata`
-動画のメタデータを取得するメソッドです。
+#### `def Video.get_metadata() -> dict[str, Union[Video.Metadata, dict]]`
+動画のメタデータを取得する関数です。  
+  
+返り値:
+```python3
+{"data": rawdataを元にしたVideo.Metadataインスタンス, "rawdict": 取得した生データをdictに変換したもの}
+```
 
-#### `class Video.Metadata(長すぎるので省略) -> Video.Metadata`
-動画のメタデータのクラスです。   
+#### `class Video.Metadata(省略)`
+動画のメタデータを格納するクラスです。`Video.get_metadata()`の返り値に含まれます。   
 
 インスタンス変数一覧:
 ```
-videoid: str = 動画ID
-title: str = 動画タイトル
-description: str = 動画概要
-owner: Video.Metadata.User = 投稿者
-counts: Video.Metadata.Counts = 各種カウンター
-duration: int = 動画長（秒）
-postdate: datetime.datetime = 投稿日時
-genre: Video.Metadata.Genre = ジャンル
-tags: list[Video.Metadata.Tag] = タグ一覧
-ranking: Video.Metadata.Ranking = ランキングデータ
-series: Video.Metadata.Series = シリーズ
-thumbnail: Video.Metadata.Thumbnail = サムネイル
-url: str = 視聴URL
+videoid    : str                      = 動画ID
+title      : str                      = 動画タイトル
+description: str                      = 動画概要
+owner      : Video.Metadata.User      = 投稿者
+counts     : Video.Metadata.Counts    = 各種カウンター
+duration   : int                      = 動画長（秒）
+postdate   : datetime.datetime        = 投稿日時
+genre      : Video.Metadata.Genre     = ジャンル
+tags       : list[Video.Metadata.Tag] = タグ一覧
+ranking    : Video.Metadata.Ranking   = ランキングデータ
+series     : Video.Metadata.Series    = シリーズ
+thumbnail  : Video.Metadata.Thumbnail = サムネイル
+url        : str                      = 視聴URL
 ```
 
-##### `class Video.Metadata.User(nickname: str = ユーザーのニックネーム, id: str = ユーザーID) -> Video.Metadata.User`
+##### `class Video.Metadata.User(省略)`
 ユーザーのクラスです。投稿者などを表します。  
   
 インスタンス変数一覧:
 ```
 nickname: str = ユーザーニックネーム
-id: int = ユーザーID
+userid  : int = ユーザーID
 ```
 
-##### `class Video.Metadata.Counts(comments: int = コメント数, likes: int = いいね！数, mylists: int = マイリス数, views: id = 再生数) -> Video.Metadata.Counts`
+##### `class Video.Metadata.Counts(省略)`
 各種カウンターのクラスです。再生数などのカウンターを表します。  
   
 インスタンス変数一覧:
 ```
 comments: int = コメント数
-likes: int = いいね！数
-mylists: int = マイリスト数
-views: int = 再生数
+likes   : int = いいね！数
+mylists : int = マイリスト数
+views   : int = 再生数
 ```
 
-##### `class Video.Metadata.Genre(label: str = ジャンル名, key: ジャンルの内部キー) -> Video.Metadata.Genre`
+##### `class Video.Metadata.Genre()`
 ジャンルのクラスです。  
   
 インスタンス変数一覧:
 ```
 label: str = ジャンル名
-key: str = 内部識別キー
+key  : str = ジャンルの内部識別キー
 ```
 
-##### `class Video.Metadata.Tag(name: str = タグ名, locked: bool = タグロック) -> Video.Metadata.Tag`
+##### `class Video.Metadata.Tag(省略)`
 タグのクラスです。  
   
 インスタンス変数一覧:
 ```
-name: str = タグ名
+name  : str  = タグ名
 locked: bool = タグロック
 ```
-##### `class Video.Metadata.Ranking(genreranking: Union[Video.Metadata.Ranking.Genre, NoneType] = ジャンルのランキング情報, tagrankings: list[Video.Metadata.Ranking.Tag] = タグ別のランキング情報)`
+
+##### `class Video.Metadata.Ranking(省略)`
 ランキングのクラスです。  
   
 インスタンス変数一覧:
 ```
 genreranking: Union[Video.Metadata.Ranking.Genre, NoneType] = ジャンルのランキング情報
-tagrankings: list[Video.Metadata.Ranking.Tag] = タグ別のランキング情報
+tagrankings : list[Video.Metadata.Ranking.Tag]              = タグ別のランキング情報
 ```
-###### `class Video.Metadata.Ranking.Genre(genre: Video.Metadata.Genre = ジャンル, rank: int = ランキング最高順位, time: datetime.datetime = 順位獲得日時)`
-ランキング情報とジャンルをまとめて収納するクラスです。  
+###### `class Video.Metadata.Ranking.Genre(省略)`
+ジャンル別ランキングを格納するクラスです。  
   
 インスタンス変数一覧:
 ```
 genre: Video.Metadata.Genre = ジャンル
-rank: int = ランキング最高順位
-time: datetime.datetime = 順位獲得日時
+rank : int                  = ランキング最高順位
+time : datetime.datetime    = 順位獲得日時
 ```
-###### `class Video.Metadata.Ranking.Tag(tag: Video.Metadata.Tag = タグ, rank: int = ランキング最高順位, time: datetime.datetime - 順位獲得日時)`
-Video.Metadata.Ranking.Genreと使い方は同じなのでカット。
 
-##### `Class Video.Metadata.Series(seriesid: int = シリーズID, title: str = シリーズタイトル, description: str = シリーズ概要, thumbnail: str = サムネイルURL, prev_video: Union[Video, NoneType] = 前動画, next_video: Union[Video, NoneType] = 次動画, first_video: Union[Video, NoneType] = 最初の動画)`
+###### `class Video.Metadata.Ranking.Tag(省略)`
+タグ別ランキングを格納するクラスです。  
+  
+インスタンス変数一覧:
+```
+tag : Video.Metadata.Tag = タグ
+rank: int                = ランキング最高順位
+time: datetime.datetime  = 順位獲得日時
+```
+
+##### `Class Video.Metadata.Series(省略)`
 シリーズのクラスです。  
   
 ```
-id: int = シリーズID
-title: str = シリーズタイトル
-description: str = シリーズ概要
-thumbnail: str = サムネイルURL
-prev_video: Union[Video, NoneType] = 前動画
-next_video: Union[Video, NoneType] = 次動画
+seriesid   : int                    = シリーズID
+title      : str                    = シリーズタイトル
+description: str                    = シリーズ概要
+thumbnail  : str                    = サムネイルURL
+prev_video : Union[Video, NoneType] = 前動画
+next_video : Union[Video, NoneType] = 次動画
 first_video: Union[Video, NoneType] = 最初の動画
 ```
 
-##### `Class Video.Metadata.Thumbnail(small_url: str = サムネイル（小）URL, middle_url: str = サムネイル（中）URL, large_url: str = サムネイル（大）URL, player_url: str = サムネイル（プレイヤー用）URL, ogp_url: str = サムネイル（OGP表示用）URL)`
+##### `Class Video.Metadata.Thumbnail(省略)`
 サムネイル画像のクラスです。  
   
 ```
-small_url: str = サムネイル（小）URL
+small_url : str = サムネイル（小）URL
 middle_url: str = サムネイル（中）URL
-large_url: str = サムネイル（大）URL
+large_url : str = サムネイル（大）URL
 player_url: str = サムネイル（プレイヤー用）URL
-ogp_url: str = サムネイル（OGP表示用）URL
+ogp_url   : str = サムネイル（OGP表示用）URL
 ```
 # License
 適用ライセンス: LGPL 3.0  
