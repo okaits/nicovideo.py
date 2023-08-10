@@ -34,9 +34,6 @@ class Video():
     """ Video """
     videoid: str
 
-    def __post_init__(self):
-        self.rawdict: dict = {}
-
     @dataclass
     class Metadata(): # pylint: disable=R0902
         """ Meta data """
@@ -121,7 +118,7 @@ class Video():
             player_url: Union[str, type(None)]
             ogp_url   : Union[str, type(None)]
 
-    def get_metadata(self, use_cache: bool = False) -> Video.Metadata:
+    def get_metadata(self, use_cache: bool = False) -> dict[str, Union[Video.Metadata, dict]]:
         """ Get video's metadata """
         watch_url = f"https://www.nicovideo.jp/watch/{self.videoid}"
         try:
@@ -142,81 +139,81 @@ class Video():
             raise Error.NicovideoClientError.ConnectionError("Connection error.") from exc
 
         soup = bs(text, "html.parser")
-        self.rawdict = json5.loads(
+        rawdict = json5.loads(
             str(soup.find("div", id="js-initial-watch-data")["data-api-data"])
         )
 
         # Tags
         tags = []
-        for tag in self.rawdict['tag']['items']:
+        for tag in rawdict['tag']['items']:
             tags.append(
-                self.Metadata.Tag(
-                    name=tag['name'],
-                    locked=tag['isLocked']
+                Video.Metadata.Tag(
+                    name   = tag['name'],
+                    locked = tag['isLocked']
                 )
             )
 
         # Ranking
         ranking_tags = []
-        for ranking_tag in self.rawdict['ranking']['popularTag']:
+        for ranking_tag in rawdict['ranking']['popularTag']:
             for tag in tags:
                 if tag.name == ranking_tag['tag']:
                     ranking_tags.append(
-                        self.Metadata.Ranking.Tag(
+                        Video.Metadata.Ranking.Tag(
                             tag,
                             ranking_tag['rank'],
                             datetime.datetime.fromisoformat(ranking_tag['dateTime'])
                         )
                     )
                     break
-        ranking_genre = self.Metadata.Ranking.Genre(
-            self.rawdict['ranking']['genre']['genre'],
-            self.rawdict['ranking']['genre']['rank'] ,
-            datetime.datetime.fromisoformat(self.rawdict['ranking']['genre']['dateTime'])
-        ) if self.rawdict['ranking']['genre'] else None
+        ranking_genre = Video.Metadata.Ranking.Genre(
+            rawdict['ranking']['genre']['genre'],
+            rawdict['ranking']['genre']['rank'] ,
+            datetime.datetime.fromisoformat(rawdict['ranking']['genre']['dateTime'])
+        ) if rawdict['ranking']['genre'] else None
 
         data = self.Metadata(
-            videoid     = self.rawdict['video']['id'],
-            title       = self.rawdict['video']['title'],
-            description = self.rawdict['video']['description'],
-            owner       = self.Metadata.User(
-                           nickname = self.rawdict['owner']['nickname'],
-                           userid   = self.rawdict['owner']['id']
+            videoid     = rawdict['video']['id'],
+            title       = rawdict['video']['title'],
+            description = rawdict['video']['description'],
+            owner       = Video.Metadata.User(
+                           nickname = rawdict['owner']['nickname'],
+                           userid   = rawdict['owner']['id']
                           ),
             counts      = self.Metadata.Counts(
-                           comments = self.rawdict['video']['count']['comment'],
-                           likes    = self.rawdict['video']['count']['like'],
-                           mylists  = self.rawdict['video']['count']['mylist'],
-                           views    = self.rawdict['video']['count']['view']
+                           comments = rawdict['video']['count']['comment'],
+                           likes    = rawdict['video']['count']['like'],
+                           mylists  = rawdict['video']['count']['mylist'],
+                           views    = rawdict['video']['count']['view']
                           ),
-            duration    = self.rawdict['video']['duration'],
+            duration    = rawdict['video']['duration'],
             postdate    = datetime.datetime.fromisoformat(
-                           self.rawdict['video']['registeredAt']
+                           rawdict['video']['registeredAt']
                           ),
-            genre       = self.Metadata.Genre(
-                           label    = self.rawdict['genre']['label'],
-                           key      = self.rawdict['genre']['key']
+            genre       = Video.Metadata.Genre(
+                           label    = rawdict['genre']['label'],
+                           key      = rawdict['genre']['key']
                           ),
-            ranking     = self.Metadata.Ranking(ranking_genre, ranking_tags),
-            series      = self.Metadata.Series(
-                           seriesid = self.rawdict['series']['id'],
-                           title = self.rawdict['series']['title'],
-                           description= self.rawdict['series']['description'],
-                           thumbnail = self.rawdict['series']['thumbnailUrl'],
-                           prev_video = Video(self.rawdict['series']['video']['prev']['id'])
-                               if self.rawdict['series']['video']['prev'] else None,
-                           next_video = Video(self.rawdict['series']['video']['next']['id'])
-                               if self.rawdict['series']['video']['next'] else None,
-                           first_video = Video(self.rawdict['series']['video']['first']['id'])
-                               if self.rawdict['series']['video']['first'] else None
-               ) if self.rawdict['series'] else None,
-            thumbnail   = self.Metadata.Thumbnail(
-                           small_url  = self.rawdict['video']['thumbnail']['url'],
-                           middle_url = self.rawdict['video']['thumbnail']['middleUrl'],
-                           large_url  = self.rawdict['video']['thumbnail']['largeUrl'],
-                           player_url = self.rawdict['video']['thumbnail']['player'],
-                           ogp_url    = self.rawdict['video']['thumbnail']['ogp']
+            ranking     = Video.Metadata.Ranking(ranking_genre, ranking_tags),
+            series      = Video.Metadata.Series(
+                           seriesid    = rawdict['series']['id'],
+                           title       = rawdict['series']['title'],
+                           description = rawdict['series']['description'],
+                           thumbnail   = rawdict['series']['thumbnailUrl'],
+                           prev_video  = Video(rawdict['series']['video']['prev']['id'])
+                               if rawdict['series']['video']['prev'] else None,
+                           next_video  = Video(rawdict['series']['video']['next']['id'])
+                               if rawdict['series']['video']['next'] else None,
+                           first_video = Video(rawdict['series']['video']['first']['id'])
+                               if rawdict['series']['video']['first'] else None
+               ) if rawdict['series'] else None,
+            thumbnail   = Video.Metadata.Thumbnail(
+                           small_url  = rawdict['video']['thumbnail']['url'],
+                           middle_url = rawdict['video']['thumbnail']['middleUrl'],
+                           large_url  = rawdict['video']['thumbnail']['largeUrl'],
+                           player_url = rawdict['video']['thumbnail']['player'],
+                           ogp_url    = rawdict['video']['thumbnail']['ogp']
                 ),
             tags        = tags
         )
-        return data
+        return {"data": data, "rawdict": rawdict}
