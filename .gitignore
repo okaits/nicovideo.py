@@ -6,3 +6,4 @@ dist
 fordebug.py
 .vscode
 fordebug-data.json
+.mypy_cache
