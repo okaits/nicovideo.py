@@ -24,43 +24,45 @@ metadata = video.get_metadata()['data']
 `class クラス名(初期化時の引数: 型ヒント = デフォルト値, ...)`  
 `def   関数名(引数: 型ヒント = デフォルト値, ...) -> 返り値型ヒント`
 
-### `class Video(videoid: str = 動画ID)`
-動画のクラスです。このクラス以外はすべて`get_metadata()`が管理するので、基本的にはこのクラス以外を扱う必要はありません。  
-  
-インスタンス変数一覧:
-```
-videoid: str = 動画ID
-```
-
-#### `def Video.get_metadata() -> dict[str, Union[Video.Metadata, dict]]`
+### `def Video.get_metadata(videoid: str, return_rawdict: bool = False, use_cache: bool = False) -> ...`
 動画のメタデータを取得する関数です。  
   
 返り値:
 ```python3
-{"data": rawdataを元にしたVideo.Metadataインスタンス, "rawdict": 取得した生データをdictに変換したもの}
+# return_rawdictがTrueの場合:
+{
+    "data": 指定された動画の動画情報のパース結果（Video.Metadata）,
+    "rawdict": パース前のウェブサイトから直接取得したデータ（dict）
+}
+
+# return_rawdictが未指定/Falseの場合:
+指定された動画の動画情報のパース結果（Video.Metadata）
 ```
 
-#### `class Video.Metadata(省略)`
-動画のメタデータを格納するクラスです。`Video.get_metadata()`の返り値に含まれます。   
+### `class Video(videoid: str = 動画ID)`
+動画のクラスです。このクラスはネストされた物を含めてすべて`get_metadata()`が管理するので、基本的には手動で初期化することはありません。  
+
+#### `class Video.Metadata(...)`
+動画のメタデータを格納するクラスです。`get_metadata()`の返り値に含まれます。   
 
 インスタンス変数一覧:
 ```
-videoid    : str                      = 動画ID
-title      : str                      = 動画タイトル
-description: str                      = 動画概要
-owner      : Video.Metadata.User      = 投稿者
-counts     : Video.Metadata.Counts    = 各種カウンター
-duration   : int                      = 動画長（秒）
-postdate   : datetime.datetime        = 投稿日時
-genre      : Video.Metadata.Genre     = ジャンル
-tags       : list[Video.Metadata.Tag] = タグ一覧
-ranking    : Video.Metadata.Ranking   = ランキングデータ
-series     : Video.Metadata.Series    = シリーズ
-thumbnail  : Video.Metadata.Thumbnail = サムネイル
-url        : str                      = 視聴URL
+videoid    : str                             = 動画ID
+title      : str                             = 動画タイトル
+description: str                             = 動画概要
+owner      : Video.Metadata.User             = 投稿者
+counts     : Video.Metadata.Counts           = 各種カウンター
+duration   : int                             = 動画長（秒）
+postdate   : datetime.datetime               = 投稿日時
+genre      : Optional[Video.Metadata.Genre]  = ジャンル
+tags       : list[Video.Metadata.Tag]        = タグ一覧
+ranking    : Video.Metadata.Ranking          = ランキングデータ
+series     : Optional[Video.Metadata.Series] = シリーズ
+thumbnail  : Video.Metadata.Thumbnail        = サムネイル
+url        : str                             = 視聴URL
 ```
 
-##### `class Video.Metadata.User(省略)`
+##### `class Video.Metadata.User(...)`
 ユーザーのクラスです。投稿者などを表します。  
   
 インスタンス変数一覧:
@@ -69,7 +71,7 @@ nickname: str = ユーザーニックネーム
 userid  : int = ユーザーID
 ```
 
-##### `class Video.Metadata.Counts(省略)`
+##### `class Video.Metadata.Counts(...)`
 各種カウンターのクラスです。再生数などのカウンターを表します。  
   
 インスタンス変数一覧:
@@ -80,7 +82,7 @@ mylists : int = マイリスト数
 views   : int = 再生数
 ```
 
-##### `class Video.Metadata.Genre()`
+##### `class Video.Metadata.Genre(...)`
 ジャンルのクラスです。  
   
 インスタンス変数一覧:
@@ -89,7 +91,7 @@ label: str = ジャンル名
 key  : str = ジャンルの内部識別キー
 ```
 
-##### `class Video.Metadata.Tag(省略)`
+##### `class Video.Metadata.Tag(...)`
 タグのクラスです。  
   
 インスタンス変数一覧:
@@ -98,7 +100,7 @@ name  : str  = タグ名
 locked: bool = タグロック
 ```
 
-##### `class Video.Metadata.Ranking(省略)`
+##### `class Video.Metadata.Ranking(...)`
 ランキングのクラスです。  
   
 インスタンス変数一覧:
@@ -106,7 +108,7 @@ locked: bool = タグロック
 genreranking: Union[Video.Metadata.Ranking.Genre, NoneType] = ジャンルのランキング情報
 tagrankings : list[Video.Metadata.Ranking.Tag]              = タグ別のランキング情報
 ```
-###### `class Video.Metadata.Ranking.Genre(省略)`
+###### `class Video.Metadata.Ranking.Genre(...)`
 ジャンル別ランキングを格納するクラスです。  
   
 インスタンス変数一覧:
@@ -116,7 +118,7 @@ rank : int                  = ランキング最高順位
 time : datetime.datetime    = 順位獲得日時
 ```
 
-###### `class Video.Metadata.Ranking.Tag(省略)`
+###### `class Video.Metadata.Ranking.Tag(...)`
 タグ別ランキングを格納するクラスです。  
   
 インスタンス変数一覧:
@@ -126,7 +128,7 @@ rank: int                = ランキング最高順位
 time: datetime.datetime  = 順位獲得日時
 ```
 
-##### `Class Video.Metadata.Series(省略)`
+##### `Class Video.Metadata.Series(...)`
 シリーズのクラスです。  
   
 ```
@@ -139,7 +141,7 @@ next_video : Union[Video, NoneType] = 次動画
 first_video: Union[Video, NoneType] = 最初の動画
 ```
 
-##### `Class Video.Metadata.Thumbnail(省略)`
+##### `Class Video.Metadata.Thumbnail(...)`
 サムネイル画像のクラスです。  
   
 ```
