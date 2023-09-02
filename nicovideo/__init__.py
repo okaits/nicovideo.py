@@ -5,13 +5,19 @@ import datetime
 import urllib.error
 import urllib.request
 from functools import cache
-from typing import Literal, Optional, TypedDict, Final, overload
+from typing import Literal, Optional, TypedDict, Final, Annotated, TypeAlias, overload
 from dataclasses import dataclass
+import re
 
 import json5
 from bs4 import BeautifulSoup as bs
 
 __version__ = '2.0.0'
+
+VIDEOID: TypeAlias = Annotated[str, re.compile(
+    "^sm.*$|^nm.*$|^so.*$|^ax.*$|^ca.*$|^cd.*$|^cw.*$|^fx.*$|^ig.*$|^na.*$|^om.*$|^sd.*$"\
+    "|^sk.*$|^yk.*$|^yo.*$|^za.*$|^zb.*$|^zc.*$|^zd.*$|^ze.*$|^nl.*$"
+)]
 
 class Error():
     """ Errors """
@@ -34,7 +40,7 @@ class Video():
     @dataclass
     class Metadata(): # pylint: disable=R0902
         """ Meta data """
-        videoid    : str
+        videoid    : VIDEOID
         title      : str
         description: str
         owner      : Video.Metadata.User
@@ -120,18 +126,18 @@ class _ReturnDataWithRawdict(TypedDict):
     rawdict: dict
 
 @overload
-def get_metadata(videoid: str, *, use_cache: bool = False) -> Video.Metadata: ...
+def get_metadata(videoid: VIDEOID, *, use_cache: bool = False) -> Video.Metadata: ...
 
 @overload
-def get_metadata(videoid: str, *, return_rawdict: Literal[False], use_cache: bool = False) \
+def get_metadata(videoid: VIDEOID, *, return_rawdict: Literal[False], use_cache: bool = False) \
         -> Video.Metadata: ...
 
 @overload
-def get_metadata(videoid: str, *, return_rawdict: Literal[True], use_cache: bool = False) \
+def get_metadata(videoid: VIDEOID, *, return_rawdict: Literal[True], use_cache: bool = False) \
         -> _ReturnDataWithRawdict: ...
 
-def get_metadata(videoid: str, *, return_rawdict: bool = False, use_cache: bool = False): #pylint: disable=C0301
-    """ Get video's metadata """
+def get_metadata(videoid: VIDEOID, *, return_rawdict: bool = False, use_cache: bool = False): #pylint: disable=C0301
+    """ Get content's metadata """
     watch_url = f"https://www.nicovideo.jp/watch/{videoid}"
     try:
         if use_cache:
