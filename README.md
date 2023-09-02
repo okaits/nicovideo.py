@@ -24,7 +24,7 @@ metadata = video.get_metadata()['data']
 `class クラス名(初期化時の引数: 型ヒント = デフォルト値, ...)`  
 `def   関数名(引数: 型ヒント = デフォルト値, ...) -> 返り値型ヒント`
 
-### `def Video.get_metadata(videoid: str, return_rawdict: bool = False, use_cache: bool = False) -> ...`
+### `def Video.get_metadata(videoid: str, *, return_rawdict: bool = False, use_cache: bool = False) -> ...`
 動画のメタデータを取得する関数です。  
   
 返り値:
