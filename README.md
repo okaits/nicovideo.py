@@ -164,7 +164,7 @@ ogp_url   : str = サムネイル（OGP表示用）URL
 動画のメタデータを格納するクラスです。`get_metadata()`の返り値です。   
 
 インスタンス変数一覧:
-```python3
+```
 nickname          : str                           = ユーザーニックネーム
 userid            : int                           = ユーザーID
 description       : User.Metadata.Description     = ユーザー説明欄（bio）
@@ -184,7 +184,7 @@ rawdict           : dict                          = サーバーから取得し�
 ユーザーの説明文(bio)です。  
   
 インスタンス変数一覧:
-```python3
+```
 description_html : str = 説明欄（text/html）
 description_plain: str = 説明欄（text/plain）
 ```
@@ -196,7 +196,7 @@ description_plain: str = 説明欄（text/plain）
 SNSサービスの名称とかアイコンとかです。  
   
 インスタンス変数一覧:
-```python3
+```
 name: str = SNSサービス名称
 key : str = SNSのタイプ
 icon: str = SNSのロゴ（PNGファイルのURL）
@@ -206,9 +206,9 @@ icon: str = SNSのロゴ（PNGファイルのURL）
 SNSユーザーについてのクラスです。  
   
 インスタンス変数一覧:
-```python3
+```
 service: User.Metadata.SNS.Service = SNSサービス
-name   : str                       = SNSユーザ＝名
+name   : str                       = SNSユーザー名
 url    : str                       = SNSプロフィールURL
 ```
 
@@ -216,7 +216,7 @@ url    : str                       = SNSプロフィールURL
 ユーザーのカバー画像についてのクラスです。  
   
 インスタンス変数一覧:
-```python3
+```
 ogp: str = OGP用カバー画像URL
 pc : str = PCサイズカバー画像URL
 sp : str = SP（スマートフォン）サイズカバー画像
@@ -226,7 +226,7 @@ sp : str = SP（スマートフォン）サイズカバー画像
 ユーザーアイコンについてのクラスです。  
   
 インスタンス変数一覧:
-```python3
+```
 small: str = ユーザーアイコン（小）URL
 large: str = ユーザーアイコン（大）URL
 ```
