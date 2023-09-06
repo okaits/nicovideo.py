@@ -11,7 +11,7 @@ python3 -m pip install nicovideo.py
 ```
 
 ### 情報取得
-このようにすると、動画の情報を取得できます。
+このようにすると、動画やユーザーの情報を取得できます。
 
 ```python3
 import nicovideo
