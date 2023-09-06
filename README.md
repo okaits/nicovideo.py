@@ -4,10 +4,10 @@
 
 ## 使い方
 ### 初期設定
-Python3を使える環境を作り、cloneしたらrequirements.txtから依存モジュールをインストールしてください。  
+Python3を使える環境を作り、こんな感じにインストールしてください。
 
 ```bash
-python3 -m pip install -r requirements.txt
+python3 -m pip install nicovideo.py
 ```
 
 ### 情報取得
