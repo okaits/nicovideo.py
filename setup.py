@@ -12,7 +12,7 @@ setup(
     long_description=readme,
     long_description_content_type='text/markdown',
     author='okaits#7534',
-    author_email='okaits@okaits7534.mydns.jp',
+    author_email='okaits@okaits7534.net',
     url='https://github.com/okaits/nicovideo.py',
     classifiers=[
         'Development Status :: 5 - Production/Stable',
