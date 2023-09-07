@@ -42,7 +42,7 @@ print(f"ユーザーレベル: {kurita.user_level}")
 返り値: `Video.Metadata`
 
 #### `class Video.Metadata(...)`
-動画のメタデータを格納するクラスです。`get_metadata()`の返り値です。   
+動画のメタデータを格納するクラスです。`Video.get_metadata()`の返り値です。   
 
 インスタンス変数一覧:
 ```
@@ -105,7 +105,7 @@ locked: bool = タグロック
   
 インスタンス変数一覧:
 ```
-genreranking: Union[Video.Metadata.Ranking.Genre, NoneType] = ジャンルのランキング情報
+genreranking: Optional[Video.Metadata.Ranking.Genre] = ジャンルのランキング情報
 tagrankings : list[Video.Metadata.Ranking.Tag]              = タグ別のランキング情報
 ```
 ###### `class Video.Metadata.Ranking.Genre(...)`
@@ -132,13 +132,13 @@ time: datetime.datetime  = 順位獲得日時
 シリーズのクラスです。  
   
 ```
-seriesid   : int                    = シリーズID
-title      : str                    = シリーズタイトル
-description: str                    = シリーズ概要
-thumbnail  : str                    = サムネイルURL
-prev_video : Union[Video, NoneType] = 前動画
-next_video : Union[Video, NoneType] = 次動画
-first_video: Union[Video, NoneType] = 最初の動画
+seriesid   : int             = シリーズID
+title      : str             = シリーズタイトル
+description: str             = シリーズ概要
+thumbnail  : str             = サムネイルURL
+prev_video : Optional[Video] = 前動画
+next_video : Optional[Video] = 次動画
+first_video: Optional[Video] = 最初の動画
 ```
 
 ##### `class Video.Metadata.Thumbnail(...)`
@@ -161,7 +161,7 @@ ogp_url   : str = サムネイル（OGP表示用）URL
 返り値: `User.Metadata`
 
 #### `class User.Metadata(...)`
-動画のメタデータを格納するクラスです。`get_metadata()`の返り値です。   
+動画のメタデータを格納するクラスです。`User.get_metadata()`の返り値です。   
 
 インスタンス変数一覧:
 ```
