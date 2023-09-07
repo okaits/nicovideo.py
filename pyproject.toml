@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "nicovideo.py"
-version = "3.0.0"
+version = "3.0.1"
 authors = [{name = "okaits#7534", email = "okaits@okaits7534.net"}]
 license = {text = "GNU Lesser General Public License 3.0"}
 description = "Get nicovideo's video metadata."
