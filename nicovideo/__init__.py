@@ -58,6 +58,10 @@ class Video():
             nickname: str
             userid  : str
 
+            def get_metadata(self) -> User.Metadata:
+                """ Convert to User.Metadata """
+                return User.get_metadata(int(self.userid))
+
         @dataclass
         class Counts():
             """ Counts data """

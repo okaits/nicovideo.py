@@ -71,6 +71,9 @@ nickname: str = ユーザーニックネーム
 userid  : int = ユーザーID
 ```
 
+###### `def Video.Metadata.User.get_metadata() -> User.Metadata`
+`Video.Metadata.User`インスタンスを`User.Metadata`インスタンスに変換します。
+
 ##### `class Video.Metadata.Counts(...)`
 各種カウンターのクラスです。再生数などのカウンターを表します。  
   
@@ -106,7 +109,7 @@ locked: bool = タグロック
 インスタンス変数一覧:
 ```
 genreranking: Optional[Video.Metadata.Ranking.Genre] = ジャンルのランキング情報
-tagrankings : list[Video.Metadata.Ranking.Tag]              = タグ別のランキング情報
+tagrankings : list[Video.Metadata.Ranking.Tag]       = タグ別のランキング情報
 ```
 ###### `class Video.Metadata.Ranking.Genre(...)`
 ジャンル別ランキングを格納するクラスです。  
