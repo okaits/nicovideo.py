@@ -148,28 +148,21 @@ class Video():
         )
 
         # Tags
-        tags = []
-        for tag in rawdict['tag']['items']:
-            tags.append(
-                Video.Metadata.Tag(
-                    name   = tag['name'],
-                    locked = tag['isLocked']
-                )
-            )
+        tags = [
+            Video.Metadata.Tag(
+                name   = tag["name"],
+                locked = tag["isLocked"]
+            ) for tag in rawdict["tag"]["items"]]
 
         # Ranking
-        ranking_tags = []
-        for ranking_tag in rawdict['ranking']['popularTag']:
-            for tag in tags:
-                if tag.name == ranking_tag['tag']:
-                    ranking_tags.append(
-                        Video.Metadata.Ranking.Tag(
-                            tag,
-                            ranking_tag['rank'],
-                            datetime.datetime.fromisoformat(ranking_tag['dateTime'])
-                        )
-                    )
-                    break
+        ranking_tags = [
+            Video.Metadata.Ranking.Tag(
+                tag,
+                ranking_tag["rank"],
+                datetime.datetime.fromisoformat(ranking_tag["dateTime"])
+            ) for tag in tags if tag.name == ranking_tag['tag']
+              for ranking_tag in rawdict['ranking']['popularTag']
+        ]
         ranking_genre = Video.Metadata.Ranking.Genre(
             rawdict['ranking']['genre']['genre'],
             rawdict['ranking']['genre']['rank'] ,
