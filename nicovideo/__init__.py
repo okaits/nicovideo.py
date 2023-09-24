@@ -176,8 +176,8 @@ class Video():
                 tag,
                 ranking_tag["rank"],
                 datetime.datetime.fromisoformat(ranking_tag["dateTime"])
-            ) for tag in tags if tag.name == ranking_tag['tag'] # type: ignore
-              for ranking_tag in rawdict['ranking']['popularTag']
+            ) for ranking_tag in rawdict['ranking']['popularTag']
+              for tag in tags if tag.name == ranking_tag['tag']
         ]
         ranking_genre = cls.Metadata.Ranking.Genre(
             rawdict['ranking']['genre']['genre'],
