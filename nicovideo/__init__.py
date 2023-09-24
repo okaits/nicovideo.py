@@ -50,7 +50,24 @@ class Video():
         rawdict    : dict
 
         def __post_init__(self):
-            self.url: Final[str] = f'https://www.nicovideo.jp/watch/{self.videoid}'
+            self.url: str = f'https://www.nicovideo.jp/watch/{self.videoid}'
+
+        def refresh(self):
+            """ Refresh data """ # TODO: もっといい書き方を考える
+            refreshed_data = Video.get_metadata(self.videoid)
+            self.videoid     = refreshed_data.videoid
+            self.title       = refreshed_data.title
+            self.description = refreshed_data.description
+            self.owner       = refreshed_data.owner
+            self.counts      = refreshed_data.counts
+            self.duration    = refreshed_data.duration
+            self.postdate    = refreshed_data.postdate
+            self.genre       = refreshed_data.genre
+            self.tags        = refreshed_data.tags
+            self.ranking     = refreshed_data.ranking
+            self.series      = refreshed_data.series
+            self.thumbnail   = refreshed_data.thumbnail
+            self.rawdict     = refreshed_data.rawdict
 
         @dataclass
         class User():
@@ -234,6 +251,24 @@ class User():
         cover             : Optional[User.Metadata.Cover]
         icon              : User.Metadata.UserIcon
         rawdict           : dict
+
+        def refresh(self):
+            """ Update data """
+            refreshed_data = User.get_metadata(self.nickname)
+            self.nickname           = refreshed_data.nickname
+            self.userid             = refreshed_data.userid
+            self.description        = refreshed_data.description
+            self.user_type          = refreshed_data.user_type
+            self.registered_version = refreshed_data.registered_version
+            self.follow             = refreshed_data.follow
+            self.follower           = refreshed_data.follower
+            self.user_level         = refreshed_data.user_level
+            self.user_exp           = refreshed_data.user_exp
+            self.sns                = refreshed_data.sns
+            self.cover              = refreshed_data.cover
+            self.icon               = refreshed_data.icon
+            self.videolist          = refreshed_data.videolist
+            self.rawdict            = refreshed_data.rawdict
 
         @dataclass
         class Description():

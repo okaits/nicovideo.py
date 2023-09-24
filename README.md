@@ -36,10 +36,8 @@ print(f"ユーザーレベル: {kurita.user_level}")
 ### `class Video()`
 動画のクラスです。
 
-#### `(classmethod) def Video.get_metadata(videoid: str, *, use_cache: bool = False)`
+#### `(classmethod) def Video.get_metadata(videoid: str, *, use_cache: bool = False) -> Video.Metadata`
 動画のメタデータを取得するメソッドです。  
-  
-返り値: `Video.Metadata`
 
 #### `class Video.Metadata(...)`
 動画のメタデータを格納するクラスです。`Video.get_metadata()`の返り値です。   
@@ -61,6 +59,9 @@ thumbnail  : Video.Metadata.Thumbnail        = サムネイル
 url        : str                             = 視聴URL
 rawdict    : dict                            = サーバーから取得した加工前生データ（デバッグ用）
 ```
+
+##### `def Video.Metadata.refresh() -> None`
+自分自身を更新する関数です。
 
 ##### `class Video.Metadata.User(...)`
 ユーザーのクラスです。投稿者などを表します。（`User`クラスの簡易版です。）
@@ -182,6 +183,9 @@ cover             : Optional[User.Metadata.Cover] = カバー画像
 icon              : User.Metadata.UserIcon        = アイコン画像
 rawdict           : dict                          = サーバーから取得した加工前生データ（デバッグ用）
 ```
+
+##### `def User.Metadata.refresh() -> None`
+自分自身を更新する関数です。
 
 ##### `class User.Description(...)`
 ユーザーの説明文(bio)です。  
