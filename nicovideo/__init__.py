@@ -403,7 +403,7 @@ class User():
                         prev_video  = Ellipsis,
                         next_video  = Ellipsis,
                         first_video = Ellipsis
-                    ),
+                    ) if videodata["series"] else None
                 ) for videodata in rawdict_videodata ] if detail == "videolist" else Ellipsis,
             rawdict            = rawdict_userdata
         )
