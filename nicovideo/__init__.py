@@ -324,10 +324,9 @@ class User():
             if exc.code == 404:
                 raise Error.NicovideoClientError.ContentNotFound("User not found or deleted.")\
                     from exc
-            else:
-                raise Error.NicovideoClientError.ConnectionError(
-                    f"Unexpected HTTP Error: {exc.code}"
-                ) from exc
+            raise Error.NicovideoClientError.ConnectionError(
+                f"Unexpected HTTP Error: {exc.code}"
+            ) from exc
         except urllib.error.URLError as exc:
             raise Error.NicovideoClientError.ConnectionError("Connection error.") from exc
 
