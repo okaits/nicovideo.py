@@ -427,4 +427,3 @@ class User():
                 ) for videodata in rawdict_videodata ] if detail == "videolist" else Ellipsis,
             rawdict            = rawdict_userdata
         )
-
