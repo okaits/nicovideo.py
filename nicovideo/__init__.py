@@ -152,10 +152,9 @@ class Video():
             if exc.code == 404:
                 raise Error.NicovideoClientError.ContentNotFound("Video not found or deleted.")\
                     from exc
-            else:
-                raise Error.NicovideoClientError.ConnectionError(
-                    f"Unexpected HTTP Error: {exc.code}"
-                ) from exc
+            raise Error.NicovideoClientError.ConnectionError(
+                f"Unexpected HTTP Error: {exc.code}"
+            ) from exc
         except urllib.error.URLError as exc:
             raise Error.NicovideoClientError.ConnectionError("Connection error.") from exc
 
@@ -177,7 +176,7 @@ class Video():
                 tag,
                 ranking_tag["rank"],
                 datetime.datetime.fromisoformat(ranking_tag["dateTime"])
-            ) for tag in tags if tag.name == ranking_tag['tag']
+            ) for tag in tags if tag.name == ranking_tag['tag'] # type: ignore
               for ranking_tag in rawdict['ranking']['popularTag']
         ]
         ranking_genre = cls.Metadata.Ranking.Genre(
