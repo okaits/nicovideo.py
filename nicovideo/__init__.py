@@ -7,7 +7,6 @@ import urllib.request
 from functools import cache
 from typing import Literal, Optional, Final, Annotated
 from dataclasses import dataclass
-import re
 
 import json5
 from bs4 import BeautifulSoup as bs
