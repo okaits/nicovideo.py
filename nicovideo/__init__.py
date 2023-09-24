@@ -72,7 +72,7 @@ class Video():
         class User():
             """ User data """
             nickname: str
-            userid  : str
+            userid  : int
 
             def get_metadata(self) -> User.Metadata:
                 """ Convert to User.Metadata """
@@ -190,7 +190,7 @@ class Video():
             description = rawdict['video']['description'],
             owner       = cls.Metadata.User(
                             nickname = rawdict['owner']['nickname'],
-                            userid   = rawdict['owner']['id']
+                            userid   = int(rawdict['owner']['id'])
                             ),
             counts      = cls.Metadata.Counts(
                             comments = rawdict['video']['count']['comment'],
