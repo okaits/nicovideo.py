@@ -138,8 +138,8 @@ class Video():
             player_url: Optional[str]
             ogp_url   : Optional[str]
 
-    @staticmethod
-    def get_metadata(videoid: str, *, use_cache: bool = False): #pylint: disable=C0301
+    @classmethod
+    def get_metadata(cls, videoid: str, *, use_cache: bool = False): #pylint: disable=C0301
         """ Get video's metadata """
         watch_url = f"https://www.nicovideo.jp/watch/{videoid}"
         try:
@@ -166,35 +166,35 @@ class Video():
 
         # Tags
         tags = [
-            Video.Metadata.Tag(
+            cls.Metadata.Tag(
                 name   = tag["name"],
                 locked = tag["isLocked"]
             ) for tag in rawdict["tag"]["items"]]
 
         # Ranking
         ranking_tags = [
-            Video.Metadata.Ranking.Tag(
+            cls.Metadata.Ranking.Tag(
                 tag,
                 ranking_tag["rank"],
                 datetime.datetime.fromisoformat(ranking_tag["dateTime"])
             ) for tag in tags if tag.name == ranking_tag['tag']
               for ranking_tag in rawdict['ranking']['popularTag']
         ]
-        ranking_genre = Video.Metadata.Ranking.Genre(
+        ranking_genre = cls.Metadata.Ranking.Genre(
             rawdict['ranking']['genre']['genre'],
             rawdict['ranking']['genre']['rank'] ,
             datetime.datetime.fromisoformat(rawdict['ranking']['genre']['dateTime'])
         ) if rawdict['ranking']['genre'] else None
 
-        return Video.Metadata(
+        return cls.Metadata(
             videoid     = rawdict['video']['id'],
             title       = rawdict['video']['title'],
             description = rawdict['video']['description'],
-            owner       = Video.Metadata.User(
+            owner       = cls.Metadata.User(
                             nickname = rawdict['owner']['nickname'],
                             userid   = rawdict['owner']['id']
                             ),
-            counts      = Video.Metadata.Counts(
+            counts      = cls.Metadata.Counts(
                             comments = rawdict['video']['count']['comment'],
                             likes    = rawdict['video']['count']['like'],
                             mylists  = rawdict['video']['count']['mylist'],
@@ -204,12 +204,12 @@ class Video():
             postdate    = datetime.datetime.fromisoformat(
                             rawdict['video']['registeredAt']
                             ),
-            genre       = Video.Metadata.Genre(
+            genre       = cls.Metadata.Genre(
                             label    = rawdict['genre']['label'],
                             key      = rawdict['genre']['key']
                             ),
-            ranking     = Video.Metadata.Ranking(ranking_genre, ranking_tags),
-            series      = Video.Metadata.Series(
+            ranking     = cls.Metadata.Ranking(ranking_genre, ranking_tags),
+            series      = cls.Metadata.Series(
                             seriesid    = rawdict['series']['id'],
                             title       = rawdict['series']['title'],
                             description = rawdict['series']['description'],
@@ -221,7 +221,7 @@ class Video():
                             first_video = rawdict['series']['video']['first']['id']
                                 if rawdict['series']['video']['first'] else None
                 ) if rawdict['series'] else None,
-            thumbnail   = Video.Metadata.Thumbnail(
+            thumbnail   = cls.Metadata.Thumbnail(
                             small_url  = rawdict['video']['thumbnail']['url'],
                             middle_url = rawdict['video']['thumbnail']['middleUrl'],
                             large_url  = rawdict['video']['thumbnail']['largeUrl'],
