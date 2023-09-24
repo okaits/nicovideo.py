@@ -8,6 +8,10 @@ version = "3.1.0"
 authors = [{name = "okaits#7534", email = "okaits@okaits7534.net"}]
 license = {text = "GNU Lesser General Public License 3.0"}
 description = "Get nicovideo's video metadata."
+dependencies = [
+    "beautifulsoup4",
+    "json5"
+]
 keywords = ["nicovideo"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
