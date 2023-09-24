@@ -12,7 +12,7 @@ from dataclasses import dataclass
 import json5
 from bs4 import BeautifulSoup as bs
 
-__version__ = '3.0.1'
+__version__ = '3.1.0'
 
 class Error():
     """ Errors """
