@@ -6,6 +6,7 @@ import urllib.error
 import urllib.request
 from functools import cache
 from typing import Literal, Optional, Final, Annotated
+from types import EllipsisType
 from dataclasses import dataclass
 
 import json5
@@ -248,6 +249,7 @@ class User():
         sns               : list[User.Metadata.SNS.User]
         cover             : Optional[User.Metadata.Cover]
         icon              : User.Metadata.UserIcon
+        videolist         : list[Video.Metadata]|EllipsisType
         rawdict           : dict
 
         def refresh(self):
@@ -310,15 +312,39 @@ class User():
             small: Annotated[str, "Image URL"]
             large: Annotated[str, "Image URL"]
 
+        @dataclass
+        class Video():
+            """ Video data """
+            videoid : str
+            title   : str
+            owner   : Video.Metadata.User
+            counts  : Video.Metadata.Counts
+            duration: int
+            postdate: datetime.datetime
+            series  : Video.Metadata.Series
+
+            def get_metadata(self) -> Video.Metadata:
+                """ Convert to Video.Metadata """
+                return Video.get_metadata(self.videoid)
+
     @classmethod
-    def get_metadata(cls, userid: int, *, use_cache: bool = False):
+    def get_metadata(cls,
+                     userid: int,
+                     detail: Literal["videolist", "minimal"] = "videolist",
+                     *,
+                     use_cache: bool = False):
         """ Get user's metadata """
-        watch_url = f"https://www.nicovideo.jp/user/{userid}"
+
+        if detail == "videolist":
+            userpage_url = f"https://www.nicovideo.jp/user/{userid}/video"
+        else:
+            userpage_url = f"https://www.nicovideo.jp/user/{userid}"
+
         try:
             if use_cache:
-                text = _urllib_request_with_cache(watch_url)
+                text = _urllib_request_with_cache(userpage_url)
             else:
-                with urllib.request.urlopen(watch_url) as response:
+                with urllib.request.urlopen(userpage_url) as response:
                     text = response.read()
         except urllib.error.HTTPError as exc:
             if exc.code == 404:
@@ -333,21 +359,24 @@ class User():
         soup = bs(text, "html.parser")
         rawdict = json5.loads(
             str(soup.select("#js-initial-userpage-data")[0]["data-initial-data"])
-        )["state"]["userDetails"]["userDetails"]["user"]
+        )
+        rawdict_userdata  = rawdict["state"]["userDetails"]["userDetails"]["user"]
+        rawdict_videodata = rawdict["nvapi"][0]["body"]["data"]["items"] \
+            if detail == "videolist" else Ellipsis
 
         return cls.Metadata(
-            nickname           = rawdict["nickname"],
-            userid             = rawdict["id"],
+            nickname           = rawdict_userdata["nickname"],
+            userid             = rawdict_userdata["id"],
             description        = cls.Metadata.Description(
-                rawdict["decoratedDescriptionHtml"],
-                rawdict["strippedDescription"]
+                rawdict_userdata["decoratedDescriptionHtml"],
+                rawdict_userdata["strippedDescription"]
             ),
-            user_type          = "Premium" if rawdict["isPremium"] else "General",
-            registered_version = rawdict["registeredVersion"],
-            follow             = rawdict["followeeCount"],
-            follower           = rawdict["followerCount"],
-            user_level         = rawdict["userLevel"]["currentLevel"],
-            user_exp           = rawdict["userLevel"]["currentLevelExperience"],
+            user_type          = "Premium" if rawdict_userdata["isPremium"] else "General",
+            registered_version = rawdict_userdata["registeredVersion"],
+            follow             = rawdict_userdata["followeeCount"],
+            follower           = rawdict_userdata["followerCount"],
+            user_level         = rawdict_userdata["userLevel"]["currentLevel"],
+            user_exp           = rawdict_userdata["userLevel"]["currentLevelExperience"],
             sns                = [
                 cls.Metadata.SNS.User(
                     cls.Metadata.SNS.Service(
@@ -357,17 +386,45 @@ class User():
                     ),
                     account["screenName"],
                     account["url"]
-                ) for account in rawdict["sns"]
+                ) for account in rawdict_userdata["sns"]
             ],
             cover              = cls.Metadata.Cover(
-                rawdict["coverImage"]["ogpUrl"],
-                rawdict["coverImage"]["pcUrl"],
-                rawdict["coverImage"]["smartphoneUrl"]
-            ) if rawdict["coverImage"] else None,
+                rawdict_userdata["coverImage"]["ogpUrl"],
+                rawdict_userdata["coverImage"]["pcUrl"],
+                rawdict_userdata["coverImage"]["smartphoneUrl"]
+            ) if rawdict_userdata["coverImage"] else None,
             icon               = cls.Metadata.UserIcon(
-                rawdict["icons"]["small"],
-                rawdict["icons"]["large"]
+                rawdict_userdata["icons"]["small"],
+                rawdict_userdata["icons"]["large"]
             ),
-            rawdict            = rawdict
+            videolist          = [
+                cls.Metadata.Video(
+                    videoid     = videodata["essential"]["id"],
+                    title       = videodata["essential"]["title"],
+                    owner       = Video.Metadata.User(
+                        nickname = rawdict_userdata["nickname"],
+                        userid   = int(rawdict_userdata["id"])
+                    ),
+                    counts      = Video.Metadata.Counts(
+                        comments = videodata["essential"]["count"]["comment"],
+                        likes    = videodata["essential"]["count"]["like"],
+                        mylists  = videodata["essential"]["count"]["mylist"],
+                        views    = videodata["essential"]["count"]["view"]
+                    ),
+                    duration    = videodata["essential"]["duration"],
+                    postdate    = datetime.datetime.fromisoformat(
+                        videodata["essential"]["registeredAt"]
+                    ),
+                    series      = Video.Metadata.Series(
+                        seriesid    = videodata["series"]["id"],
+                        title       = videodata["series"]["title"],
+                        description = Ellipsis,
+                        thumbnail   = Ellipsis,
+                        prev_video  = Ellipsis,
+                        next_video  = Ellipsis,
+                        first_video = Ellipsis
+                    ),
+                ) for videodata in rawdict_videodata ] if detail == "videolist" else Ellipsis,
+            rawdict            = rawdict_userdata
         )
 

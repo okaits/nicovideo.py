@@ -64,7 +64,7 @@ rawdict    : dict                            = サーバーから取得した加
 自分自身を更新する関数です。
 
 ##### `class Video.Metadata.User(...)`
-ユーザーのクラスです。投稿者などを表します。（`User`クラスの簡易版です。）
+ユーザーのクラスです。投稿者などを表します。（`User.Metadata`クラスの簡易版です。）
   
 インスタンス変数一覧:
 ```
@@ -159,29 +159,36 @@ ogp_url   : str = サムネイル（OGP表示用）URL
 ### `class User()`
 ユーザーのクラスです。
 
-#### `(classmethod) def User.get_metadata(userid: int, *, use_cache: bool = False)`
+#### `(classmethod) def User.get_metadata(userid: int, detail: str = "videolist", *, use_cache: bool = False) -> User.Metadata`
 ユーザーのメタデータを取得するメソッドです。  
   
-返り値: `User.Metadata`
+注意事項: 返り値のUser.Metadataインスタンスの変数の型は`detail`引数によって変わります。  
+```
+detail = "videolist"の場合:
+  videolist: list[User.Metadata.Video]
+detail = "minimal"  の場合:
+  videolist: EllipsisType
+```
 
 #### `class User.Metadata(...)`
 動画のメタデータを格納するクラスです。`User.get_metadata()`の返り値です。   
 
 インスタンス変数一覧:
 ```
-nickname          : str                           = ユーザーニックネーム
-userid            : int                           = ユーザーID
-description       : User.Metadata.Description     = ユーザー説明欄（bio）
-user_type         : Literal["Premium", "General"] = ユーザータイプ（Premium/General）
-registered_version: str                           = 登録時バージョン
-follow            : int                           = フォロー数
-follower          : int                           = フォロワー数
-user_level        : int                           = ユーザーレベル
-user_exp          : int                           = ユーザーEXP
-sns               : list[User.Metadata.SNS.User]  = SNS連携情報
-cover             : Optional[User.Metadata.Cover] = カバー画像
-icon              : User.Metadata.UserIcon        = アイコン画像
-rawdict           : dict                          = サーバーから取得した加工前生データ（デバッグ用）
+nickname          : str                                    = ユーザーニックネーム
+userid            : int                                    = ユーザーID
+description       : User.Metadata.Description              = ユーザー説明欄（bio）
+user_type         : Literal["Premium", "General"]          = ユーザータイプ（Premium/General）
+registered_version: str                                    = 登録時バージョン
+follow            : int                                    = フォロー数
+follower          : int                                    = フォロワー数
+user_level        : int                                    = ユーザーレベル
+user_exp          : int                                    = ユーザーEXP
+sns               : list[User.Metadata.SNS.User]           = SNS連携情報
+cover             : Optional[User.Metadata.Cover]          = カバー画像
+icon              : User.Metadata.UserIcon                 = アイコン画像
+videolist         : list[User.Metadata.Video]|EllipsisType = 投稿動画一覧
+rawdict           : dict                                   = サーバーから取得した加工前生データ（デバッグ用）
 ```
 
 ##### `def User.Metadata.refresh() -> None`
@@ -237,6 +244,23 @@ sp : str = SP（スマートフォン）サイズカバー画像
 small: str = ユーザーアイコン（小）URL
 large: str = ユーザーアイコン（大）URL
 ```
+
+##### `class User.Metadata.Video(...)`
+動画のクラスです。投稿動画などを表します。（`Video.Metadata`クラスの簡易版です。）  
+  
+インスタンス変数一覧:
+```
+videoid : str
+title   : str
+owner   : Video.Metadata.User  # User.Metadataではない
+counts  : Video.Metadata.Counts
+duration: int
+postdate: datetime.datetime
+series  : Video.Metadata.Series
+```
+
+###### `def User.Metadata.Video.get_metadata() -> Video.Metadata`
+`User.Metadata.Video`インスタンスを`Video.Metadata`インスタンスに変換します。
 
 # License
 適用ライセンス: LGPL 3.0  
