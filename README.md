@@ -187,7 +187,7 @@ rawdict           : dict                          = サーバーから取得し�
 ##### `def User.Metadata.refresh() -> None`
 自分自身を更新する関数です。
 
-##### `class User.Description(...)`
+##### `class User.Metadata.Description(...)`
 ユーザーの説明文(bio)です。  
   
 インスタンス変数一覧:
@@ -196,10 +196,10 @@ description_html : str = 説明欄（text/html）
 description_plain: str = 説明欄（text/plain）
 ```
 
-##### `class User.SNS(...)`
+##### `class User.Metadata.SNS(...)`
 ユーザーのプロフィールに載ってるSNSについてのクラスです。
 
-###### `class User.SNS.Service(...)`
+###### `class User.Metadata.SNS.Service(...)`
 SNSサービスの名称とかアイコンとかです。  
   
 インスタンス変数一覧:
@@ -209,7 +209,7 @@ key : str = SNSのタイプ
 icon: str = SNSのロゴ（PNGファイルのURL）
 ```
 
-###### `class User.SNS.User(...)`
+###### `class User.Metadata.SNS.User(...)`
 SNSユーザーについてのクラスです。  
   
 インスタンス変数一覧:
@@ -219,7 +219,7 @@ name   : str                       = SNSユーザー名
 url    : str                       = SNSプロフィールURL
 ```
 
-##### `class User.Cover(...)`
+##### `class User.Metadata.Cover(...)`
 ユーザーのカバー画像についてのクラスです。  
   
 インスタンス変数一覧:
@@ -229,7 +229,7 @@ pc : str = PCサイズカバー画像URL
 sp : str = SP（スマートフォン）サイズカバー画像
 ```
 
-##### `class User.UserIcon(...)`
+##### `class User.Metadata.UserIcon(...)`
 ユーザーアイコンについてのクラスです。  
   
 インスタンス変数一覧:
