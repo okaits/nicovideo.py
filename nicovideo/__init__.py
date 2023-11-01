@@ -130,21 +130,26 @@ class Video():
 
     @classmethod
     def get_metadata(cls, videoid: str, *, use_cache: bool = False) -> Metadata: #pylint: disable=C0301
-        """ Get video's metadata.
-        
+        """Get video's metadata.
+
         Get video page (https://www.nicovideo.jp/watch/sm*), parse it, then return it.
 
-        >>> get_metadata(videoid="sm9", use_cache=True)
-            Video.Metadata(videoid='sm9', title='新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師', description='レッツゴー！陰陽師（フルコーラスバージョン）', ...)
-        
-        :param videoid: ID of target video.
-        :type videoid: str
-        :param use_cache: Use cache data. (If available)
-        :type use_cache: bool
-        :return: metadata of designated video.
-        :rtype: Video.Metadata
-        :raise Error.Nicovideo.ClientError.ContentNotFound: If designated video not found or deleted. (HTTP 404)
-        :raise Error.Nicovideo.ClientError.ConnectionError: If unexpected HTTP error or connection error occured.
+        Args:
+            videoid (str): ID of target video.
+            use_cache (bool): Use cache data. (If available)
+
+        Returns:
+            Video.Metadata: metadata of target video.
+
+        Raises:
+            Error.Nicovideo.ClientError.ContentNotFound: If target video not found or deleted. (HTTP 404)
+            Error.Nicovideo.ClientError.ConnectionError: If unexpected HTTP error or connection error occured.
+
+        Examples:
+
+            >>> get_metadata(videoid="sm9", use_cache=True)
+                Video.Metadata(videoid='sm9', title='新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師', description='レッツゴー！陰陽師（フルコーラスバージョン）', ...)
+
 
         """
         watch_url = f"https://www.nicovideo.jp/watch/{videoid}"
@@ -332,19 +337,25 @@ class User():
         """ Get user's metadata.
 
         Get user page (https://www.nicovideo.jp/user/*), parse it, then return it.
-        If detail is "videolist", then get uploaded video of designated user.
 
-        >>> get_metadata(userid=9003560, detail="minimal", use_cache=False)
-            User.Metadata(nickname='くりたしげたか', userid=9003560, description=User.Metadata.Description(description_html='ニコニコの代表をしてます', description_plain='ニコニコの代表をしてます'), ...)
+        Args:
+            userid (int): ID of target user.
+            detail (Literal["videolist", "minimal"]): Mode select. (See Examples.)
+            use_cache (bool): Use cache. (If available)
+        
+        Returns:
+            User.Metadata: metadata of target user.
+        
+        Raises:
+            Error.NicovideoClientError.ContentNotFound: If target user not found or deleted. (HTTP 404)
+            Error.NicovideoClientError.ConnectionError: If unexpected HTTP error or connection error occured.
+        
+        Examples:
 
-        :param userid: ID of target user.
-        :type userid: int
-        :param detail: Mode select. (For more details, see method description.)
-        :type detail: Literal["videolist", "minimal"]:
-        :return: metadata of designated user.
-        :rtype: User.Metadata
-        :raise Error.NicovideoClientError.ContentNotFound: If designated user not found or deleted. (HTTP 404)
-        :raise Error.NicovideoClientError.ConnectionError: If unexpected HTTP error or connection error occured.
+            If detail is "videolist", then get uploaded video of target user.
+
+            >>> get_metadata(userid=9003560, use_cache=True)
+                User.Metadata(nickname='くりたしげたか', userid=9003560, description=User.Metadata.Description(description_html='ニコニコの代表をしてます', description_plain='ニコニコの代表をしてます'), ...
         """
 
         if detail == "videolist":
