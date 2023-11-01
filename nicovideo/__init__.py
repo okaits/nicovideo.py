@@ -129,8 +129,24 @@ class Video():
             ogp_url   : Optional[str]
 
     @classmethod
-    def get_metadata(cls, videoid: str, *, use_cache: bool = False): #pylint: disable=C0301
-        """ Get video's metadata """
+    def get_metadata(cls, videoid: str, *, use_cache: bool = False) -> Metadata: #pylint: disable=C0301
+        """ Get video's metadata.
+        
+        Get video page (https://www.nicovideo.jp/watch/sm*), parse it, then return it.
+
+        >>> get_metadata(videoid="sm9", use_cache=True)
+            Video.Metadata(videoid='sm9', title='新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師', description='レッツゴー！陰陽師（フルコーラスバージョン）', ...)
+        
+        :param videoid: ID of target video.
+        :type videoid: str
+        :param use_cache: Use cache data. (If available)
+        :type use_cache: bool
+        :return: metadata of designated video.
+        :rtype: Video.Metadata
+        :raise Error.Nicovideo.ClientError.ContentNotFound: If designated video not found or deleted. (HTTP 404)
+        :raise Error.Nicovideo.ClientError.ConnectionError: If unexpected HTTP error or connection error occured.
+
+        """
         watch_url = f"https://www.nicovideo.jp/watch/{videoid}"
         try:
             if use_cache:
@@ -312,8 +328,24 @@ class User():
                      userid: int,
                      detail: Literal["videolist", "minimal"] = "videolist",
                      *,
-                     use_cache: bool = False):
-        """ Get user's metadata """
+                     use_cache: bool = False) -> Metadata:
+        """ Get user's metadata.
+
+        Get user page (https://www.nicovideo.jp/user/*), parse it, then return it.
+        If detail is "videolist", then get uploaded video of designated user.
+
+        >>> get_metadata(userid=9003560, detail="minimal", use_cache=False)
+            User.Metadata(nickname='くりたしげたか', userid=9003560, description=User.Metadata.Description(description_html='ニコニコの代表をしてます', description_plain='ニコニコの代表をしてます'), ...)
+
+        :param userid: ID of target user.
+        :type userid: int
+        :param detail: Mode select. (For more details, see method description.)
+        :type detail: Literal["videolist", "minimal"]:
+        :return: metadata of designated user.
+        :rtype: User.Metadata
+        :raise Error.NicovideoClientError.ContentNotFound: If designated user not found or deleted. (HTTP 404)
+        :raise Error.NicovideoClientError.ConnectionError: If unexpected HTTP error or connection error occured.
+        """
 
         if detail == "videolist":
             userpage_url = f"https://www.nicovideo.jp/user/{userid}/video"
