@@ -450,3 +450,38 @@ class User():
                 ) for videodata in rawdict_videodata ] if detail == "videolist" else Ellipsis,
             rawdict            = rawdict_userdata
         )
+
+def get_metadata(target: str, *, use_cache: bool = False) -> Video.Metadata|User.Metadata:
+    """ Get metadata of target content.
+
+    Automaticaly select get_metadata() method, then execute it.
+    user/* -> execute User .get_metadata()
+    else   -> execute Video.get_metadata()
+
+    :param target: Target content ID.
+    :type target: str
+    :param use_cache: Use cache.
+    :type use_cache: bool
+    :return: metadata of target content.
+    :rtype: Video.Metadata|User.Metadata
+    :raise Error.NicovideoClientError.ContentNotFound: If target content not found or deleted. (HTTP 404)
+    :raise Error.NicovideoClientError.ConnectionError: If unexpected HTTP error or connection error occured.
+
+    Args:
+        target (str): Target content ID.
+        use_cache (bool): Use cache. (If available)
+    
+    Returns:
+        Video.Metadata|User.Metadata: metadata of target content.
+    
+    Examples:
+        >>> get_metadata(target="sm9", use_cache=False)
+            Video.Metadata(videoid='sm9', title='新・豪血寺一族 -煩悩解放 - レッツゴー！陰陽師', description='レッツゴー！陰陽師（フルコーラスバージョン）', ...)
+        >>> get_metadata(target="user/9003560")
+            User.Metadata(nickname='くりたしげたか', userid=9003560, description=User.Metadata.Description(description_html='ニコニコの代表をしてます', description_plain='ニコニコの代表をしてます'), ...
+
+    """
+    if target.startswith("user/"):
+        return User.get_metadata(userid=target.replace("user/", str()), use_cache=use_cache)
+    else:
+        return Video.get_metadata(videoid=target, use_cache=use_cache)
