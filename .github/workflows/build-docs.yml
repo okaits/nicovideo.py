@@ -38,7 +38,7 @@ jobs:
           - name: Check for docs changes
             id: docs_changes
             run: |
-                git add -N .
+                git add -N docs
                 git diff --exit-code
             continue-on-error: true
 
