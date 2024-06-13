@@ -49,6 +49,6 @@ jobs:
                     git config --local user.name "actions-user"
                     git add docs
                     git commit -m "Generate docs"
-                    git push origin main
+                    git push origin master
                 fi
             if: steps.docs_changes.outcome == 'failure'
