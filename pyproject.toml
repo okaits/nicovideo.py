@@ -1,10 +1,23 @@
 [tool.poetry]
-name = "nicovideo-py"
-version = "0.1.0"
-description = ""
+name = "nicovideo.py"
+version = "4.0.0"
+description = "ニコニコ動画のAPIを使用して、動画や投稿者などの情報を取得するライブラリです。"
+license = "MIT"
 authors = ["okaits7534 <okaits@okaits7534.net>"]
+maintainers = ["okaits7534 <okaits@okaits7534.net>"]
 readme = "README.md"
+repository = "https://github.com/okaits/nicovideo.py"
+documentation = "https://github.com/okaits/nicovideo.py/tree/master/docs/"
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intented Audience :: Developers",
+    "Natural Language :: Japanese",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Typing :: Typed"
+]
 packages = [{include = "nicovideo"}]
+include = ["LICENSE.md", "README.md"]
 
 [tool.poetry.dependencies]
 python = "^3.12"
