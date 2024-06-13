@@ -1,0 +1,50 @@
+name: build-docs
+
+on:
+    push:
+        branches:
+          - "master"
+    workflow_dispatch:
+
+jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+          - name: Checkout repository
+            uses: actions/checkout@v4
+        
+          - name: Setup Python3
+            uses: actions/setup-python@v5
+            with:
+                python-version: '3.12.3'
+        
+          - name: Install poetry
+            run: python3 -m pip install poetry
+        
+          - name: Install dependencies
+            run: python3 -m poetry install
+        
+          - name: Run sphinx
+            run: bash ${{github.workspace}}/build-doc.sh
+        
+          - name: Move docs
+            run: |
+                rm -r docs
+                mv ${{github.workspace}}{/docs_build/output,/docs}
+                rm -r docs_build
+
+          - name: Check docs changes
+            run: |
+                echo "::set-output name=changed::$(git diff --name-only|wc -l)"
+        
+          - name: Commit & push
+            run: |
+                if ! git diff --exit-code --quiet; then
+                    git config --local user.email "action@github.com"
+                    git config --local user.name "actions-user"
+                    git add docs
+                    git commit -m "Generate docs"
+                    git push origin main
+                fi
+            if: steps.changed.output.count > 0

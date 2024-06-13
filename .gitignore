@@ -1,9 +1,2 @@
 __pycache__
-build
-dist
-*.egg-info
-.gitignore
-fordebug.py
-.vscode
-fordebug-data.json
 .mypy_cache

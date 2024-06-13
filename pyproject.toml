@@ -1,35 +1,26 @@
+[tool.poetry]
+name = "nicovideo-py"
+version = "0.1.0"
+description = ""
+authors = ["okaits7534 <okaits@okaits7534.net>"]
+readme = "README.md"
+packages = [{include = "nicovideo"}]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+pydantic = "2.7.3"
+json5 = "0.9.25"
+bs4 = "0.0.2"
+
+
+[tool.poetry.group.dev.dependencies]
+pylint = "3.2.3"
+mypy = "1.10.0"
+types-beautifulsoup4 = "4.12.0.20240511"
+sphinx = "^7.3.7"
+sphinx-rtd-theme = "^2.0.0"
+sphinx-markdown-builder = "^0.6.6"
+
 [build-system]
-requires = ["setuptools>=61.2"]
-build-backend = "setuptools.build_meta"
-
-[project]
-name = "nicovideo.py"
-version = "3.1.2"
-authors = [{name = "okaits#7534", email = "okaits@okaits7534.net"}]
-license = {text = "GNU Lesser General Public License 3.0"}
-description = "Get nicovideo's video metadata."
-dependencies = [
-    "beautifulsoup4",
-    "json5"
-]
-keywords = ["nicovideo"]
-classifiers = [
-    "Development Status :: 5 - Production/Stable",
-    "Intended Audience :: Developers",
-    "License :: OSI Approved :: GNU Lesser General Public License v3 (LGPLv3)",
-    "Natural Language :: Japanese",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3",
-    "Topic :: Software Development :: Libraries :: Python Modules",
-]
-urls = {Homepage = "https://github.com/okaits/nicovideo.py"}
-
-[project.readme]
-file = "README.md"
-content-type = "text/markdown"
-
-[tool.setuptools]
-include-package-data = false
-
-[tool.setuptools.packages]
-find = {namespaces = false}
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
