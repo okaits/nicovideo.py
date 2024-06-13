@@ -22,9 +22,6 @@ jobs:
                 python3 -m pip install poetry
                 poetry config pypi-token.pypi ${{secrets.PYPI_TOKEN}}
 
-          - name: Install dependencies
-            run: python3 -m poetry install
-
           - name: Build package
             run: python3 -m poetry build
 
