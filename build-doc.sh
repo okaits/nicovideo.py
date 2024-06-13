@@ -13,4 +13,4 @@ extensions.append("sphinx.ext.napoleon")
 extensions.append("sphinx_markdown_builder")
 html_theme = "sphinx_rtd_theme"
 '>>./docs_build/markdown/conf.py
-python3 -m poetry sphinx-build -M markdown -a docs_build docs_build/output
+python3 -m poetry run sphinx-build -M markdown -a docs_build docs_build/output
