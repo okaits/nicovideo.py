@@ -35,7 +35,7 @@ jobs:
                 mv docs_build/output docs
                 rm -r docs_build
 
-          - name: Check docs changes
+          - name: Check for docs changes
             run: |
                 echo "changed=$(git diff --name-only|wc -l)" >> $GITHUB_OUTPUT
 
