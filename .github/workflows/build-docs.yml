@@ -13,22 +13,22 @@ jobs:
         steps:
           - name: Checkout repository
             uses: actions/checkout@v4
-        
+
           - name: Setup Python3
             uses: actions/setup-python@v5
             with:
                 python-version: '3.12.3'
-        
+
           - name: Install poetry
             run: python3 -m pip install poetry
-        
+
           - name: Install dependencies
             run: python3 -m poetry install
-        
+
           - name: Run sphinx
             run: |
                 ./build-doc.sh
-        
+
           - name: Move docs
             run: |
                 rm -r docs || true
@@ -37,8 +37,8 @@ jobs:
 
           - name: Check docs changes
             run: |
-                echo "::set-output name=changed::$(git diff --name-only|wc -l)"
-        
+                echo "changed=$(git diff --name-only|wc -l)" >> $GITHUB_OUTPUT
+
           - name: Commit & push
             run: |
                 if ! git diff --exit-code --quiet; then
