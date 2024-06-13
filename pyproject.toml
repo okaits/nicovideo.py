@@ -10,7 +10,7 @@ repository = "https://github.com/okaits/nicovideo.py"
 documentation = "https://github.com/okaits/nicovideo.py/tree/master/docs/"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
-    "Intented Audience :: Developers",
+    "Intended Audience :: Developers",
     "Natural Language :: Japanese",
     "Operating System :: OS Independent",
     "Topic :: Software Development :: Libraries :: Python Modules",
