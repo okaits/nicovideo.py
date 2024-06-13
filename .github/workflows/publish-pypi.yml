@@ -1,0 +1,32 @@
+name: publish-pypi
+
+on:
+    release:
+        types: [released]
+
+jobs:
+    publish:
+        runs-on: ubuntu-latest
+
+        steps:
+          - name: Checkout repository
+            uses: actions/checkout@v4
+
+          - name: Setup Python3
+            uses: actions/setup-python@v5
+            with:
+                python-version: '3.12.3'
+
+          - name: Install poetry
+            run: |
+                python3 -m pip install poetry
+                poetry config pypi-token.pypi ${{secrets.PYPI_TOKEN}}
+
+          - name: Install dependencies
+            run: python3 -m poetry install
+
+          - name: Build package
+            run: python3 -m poetry build
+
+          - name: Publish package
+            run: python3 -m poetry publish
