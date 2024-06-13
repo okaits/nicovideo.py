@@ -26,12 +26,13 @@ jobs:
             run: python3 -m poetry install
         
           - name: Run sphinx
-            run: bash ${{github.workspace}}/build-doc.sh
+            run: |
+                ./build-doc.sh
         
           - name: Move docs
             run: |
                 rm -r docs
-                mv ${{github.workspace}}{/docs_build/output,/docs}
+                mv docs_build/output docs
                 rm -r docs_build
 
           - name: Check docs changes
