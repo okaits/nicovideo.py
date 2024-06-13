@@ -28,7 +28,7 @@ jobs:
           - name: Run sphinx
             run: |
                 ./build-doc.sh
-                tmpfile = $(mktemp)
+                tmpfile=$(mktemp)
                 tail -n +5 docs_build/output/index.md > $tmpfile
                 cat $tmpfile > docs_build/output/index.md
 
