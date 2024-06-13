@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -e
 export SPHINX_APIDOC_OPTIONS=members,show-inheritance
 mkdir -p docs_build/{markdown,output}
 python3 -m poetry run sphinx-apidoc -Fo ./docs_build/markdown nicovideo/
