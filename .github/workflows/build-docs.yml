@@ -31,7 +31,7 @@ jobs:
         
           - name: Move docs
             run: |
-                rm -r docs
+                rm -r docs || true
                 mv docs_build/output docs
                 rm -r docs_build
 
