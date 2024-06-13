@@ -49,4 +49,4 @@ jobs:
                     git commit -m "Generate docs"
                     git push origin main
                 fi
-            if: steps.docs_changes.output.changed > 0
+            if: steps.docs_changes.outputs.changed > 0
