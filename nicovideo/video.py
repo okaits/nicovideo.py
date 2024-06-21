@@ -29,6 +29,7 @@ class APIResponse():
         duration (str): 動画の長さ
         upload_date (datetime.datetime): 動画の投稿時間
         thumbnail (dict[typing.Literal["large", "middle", "ogp", "player", "small"], str]): サムネイル
+        counters (dict[typing.Literal["comment", "like", "mylist", "view"], str]): 各種カウンタ
     """
     __slots__ = ("nicovideo_id", "title", "update", "description",
                  "duration", "upload_date", "_rawdict")
@@ -40,6 +41,7 @@ class APIResponse():
     duration: int
     upload_date: datetime.datetime
     thumbnails: dict[typing.Literal["large", "middle", "ogp", "player", "small"], str]
+    counters: dict[typing.Literal["comment", "like", "mylist", "view"], str]
 
     def __init__(self, video_id: str):
         """
@@ -85,6 +87,12 @@ class APIResponse():
             "ogp": self._rawdict["video"]["thumbnail"]["ogp"],
             "player": self._rawdict["video"]["thumbnail"]["player"],
             "small": self._rawdict["video"]["thumbnail"]["url"]
+        })
+        super().__setattr__("counters", {
+            "comment": self._rawdict["video"]["count"]["comment"],
+            "like": self._rawdict["video"]["count"]["like"],
+            "mylist": self._rawdict["video"]["count"]["mylist"],
+            "view": self._rawdict["video"]["count"]["view"]
         })
 
     @property
