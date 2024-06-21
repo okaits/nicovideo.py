@@ -30,6 +30,7 @@ class APIResponse():
         upload_date (datetime.datetime): 動画の投稿時間
         thumbnail (dict[typing.Literal["large", "middle", "ogp", "player", "small"], str]): サムネイル
         counters (dict[typing.Literal["comment", "like", "mylist", "view"], str]): 各種カウンタ
+        genre (dict[typing.Literal["label", "key"], str]): 動画ジャンル
     """
     __slots__ = ("nicovideo_id", "title", "update", "description",
                  "duration", "upload_date", "_rawdict")
@@ -42,6 +43,7 @@ class APIResponse():
     upload_date: datetime.datetime
     thumbnails: dict[typing.Literal["large", "middle", "ogp", "player", "small"], str]
     counters: dict[typing.Literal["comment", "like", "mylist", "view"], str]
+    genre: dict[typing.Literal["label", "key"], str]
 
     def __init__(self, video_id: str):
         """
@@ -93,6 +95,10 @@ class APIResponse():
             "like": self._rawdict["video"]["count"]["like"],
             "mylist": self._rawdict["video"]["count"]["mylist"],
             "view": self._rawdict["video"]["count"]["view"]
+        })
+        super().__setattr__("genre", {
+            "label": self._rawdict["genre"]["label"],
+            "key": self._rawdict["genre"]["key"]
         })
 
     @property
