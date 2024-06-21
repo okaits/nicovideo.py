@@ -28,6 +28,9 @@ class APIResponse():
         description (str): 動画説明欄
         duration (str): 動画の長さ
         upload_date (datetime.datetime): 動画の投稿時間
+        thumbnail (dict[typing.Literal["large", "middle", "ogp", "player", "small"], str]): サムネイル
+        counters (dict[typing.Literal["comment", "like", "mylist", "view"], str]): 各種カウンタ
+        genre (dict[typing.Literal["label", "key"], str]): 動画ジャンル
     """
     __slots__ = ("nicovideo_id", "title", "update", "description",
                  "duration", "upload_date", "_rawdict")
@@ -38,6 +41,9 @@ class APIResponse():
     description: str
     duration: int
     upload_date: datetime.datetime
+    thumbnails: dict[typing.Literal["large", "middle", "ogp", "player", "small"], str]
+    counters: dict[typing.Literal["comment", "like", "mylist", "view"], str]
+    genre: dict[typing.Literal["label", "key"], str]
 
     def __init__(self, video_id: str):
         """
@@ -77,6 +83,23 @@ class APIResponse():
         super().__setattr__("upload_date", datetime.datetime.fromisoformat(
             self._rawdict["video"]["registeredAt"]
         ))
+        super().__setattr__("thumbnail", {
+            "large": self._rawdict["video"]["thumbnail"]["largeUrl"],
+            "middle": self._rawdict["video"]["thumbnail"]["middleUrl"],
+            "ogp": self._rawdict["video"]["thumbnail"]["ogp"],
+            "player": self._rawdict["video"]["thumbnail"]["player"],
+            "small": self._rawdict["video"]["thumbnail"]["url"]
+        })
+        super().__setattr__("counters", {
+            "comment": self._rawdict["video"]["count"]["comment"],
+            "like": self._rawdict["video"]["count"]["like"],
+            "mylist": self._rawdict["video"]["count"]["mylist"],
+            "view": self._rawdict["video"]["count"]["view"]
+        })
+        super().__setattr__("genre", {
+            "label": self._rawdict["genre"]["label"],
+            "key": self._rawdict["genre"]["key"]
+        })
 
     @property
     def uploader(self) -> user.APIResponse:
