@@ -28,6 +28,7 @@ class APIResponse():
         description (str): 動画説明欄
         duration (str): 動画の長さ
         upload_date (datetime.datetime): 動画の投稿時間
+        thumbnail (dict[typing.Literal["large", "middle", "ogp", "player", "small"], str]): サムネイル
     """
     __slots__ = ("nicovideo_id", "title", "update", "description",
                  "duration", "upload_date", "_rawdict")
@@ -38,6 +39,7 @@ class APIResponse():
     description: str
     duration: int
     upload_date: datetime.datetime
+    thumbnails: dict[typing.Literal["large", "middle", "ogp", "player", "small"], str]
 
     def __init__(self, video_id: str):
         """
@@ -77,6 +79,13 @@ class APIResponse():
         super().__setattr__("upload_date", datetime.datetime.fromisoformat(
             self._rawdict["video"]["registeredAt"]
         ))
+        super().__setattr__("thumbnail", {
+            "large": self._rawdict["video"]["thumbnail"]["largeUrl"],
+            "middle": self._rawdict["video"]["thumbnail"]["middleUrl"],
+            "ogp": self._rawdict["video"]["thumbnail"]["ogp"],
+            "player": self._rawdict["video"]["thumbnail"]["player"],
+            "small": self._rawdict["video"]["thumbnail"]["url"]
+        })
 
     @property
     def uploader(self) -> user.APIResponse:
