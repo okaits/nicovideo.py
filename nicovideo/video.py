@@ -78,6 +78,8 @@ def get_metadata(video_id: str) -> APIResponse:
 
     Args:
         video_id (str): 対象となる動画の、ニコニコ動画での動画ID (e.g. sm9)
+    Returns:
+        APIResponse: 取得結果
     Raises:
         errors.ContentNotFoundError: 指定された動画が存在しなかった場合に送出。
         errors.APIRequestError: ニコニコのAPIサーバへのリクエストに失敗した場合に送出。

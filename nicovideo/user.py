@@ -98,6 +98,8 @@ def get_metadata(user_id: int) -> APIResponse:
 
     Args:
         user_id (int): 対象となるユーザの、ニコニコ動画でのID (e.g. 9003560)
+    Returns:
+        APIResponse: 取得結果
     Raises:
         errors.ContentNotFoundError: 指定された動画が存在しなかった場合に送出。
         errors.APIRequestError: ニコニコのAPIサーバへのリクエストに失敗した場合に送出。
