@@ -39,6 +39,10 @@ Bases: `AttributeError`
 
 * **Parameters:**
   **user_id** (*int*) – 対象となるユーザの、ニコニコ動画でのID (e.g. 9003560)
+* **Returns:**
+  取得結果
+* **Return type:**
+  APIResponse
 * **Raises:**
   * [**errors.ContentNotFoundError**](#nicovideo.errors.ContentNotFoundError) – 指定された動画が存在しなかった場合に送出。
   * [**errors.APIRequestError**](#nicovideo.errors.APIRequestError) – ニコニコのAPIサーバへのリクエストに失敗した場合に送出。
@@ -59,6 +63,10 @@ Bases: `AttributeError`
 
 * **Parameters:**
   **video_id** (*str*) – 対象となる動画の、ニコニコ動画での動画ID (e.g. sm9)
+* **Returns:**
+  取得結果
+* **Return type:**
+  APIResponse
 * **Raises:**
   * [**errors.ContentNotFoundError**](#nicovideo.errors.ContentNotFoundError) – 指定された動画が存在しなかった場合に送出。
   * [**errors.APIRequestError**](#nicovideo.errors.APIRequestError) – ニコニコのAPIサーバへのリクエストに失敗した場合に送出。
