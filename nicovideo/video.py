@@ -2,6 +2,8 @@
 このモジュールは、ニコニコの動画を取り扱います。
 
 """
+
+#pylint: disable=W0212
 from __future__ import annotations
 
 import datetime
@@ -10,14 +12,13 @@ import typing
 import urllib.error
 import urllib.request
 
-import bs4
 import json5
 
 from . import apirawdicts, errors, user
 
-NICOVIDEO_VIDEOPAGE_URL = "https://www.nicovideo.jp/watch/{}"
+NICOVIDEO_VIDEOPAGE_URL = "https://www.nicovideo.jp/watch/{}?responseType=json"
 
-class APIResponse():
+class _APIResponse():
     """
     動画の詳細（e.g. タイトル, 概要, etc.）を格納するクラスです。
     
@@ -30,10 +31,10 @@ class APIResponse():
         upload_date (datetime.datetime): 動画の投稿時間
         thumbnail (dict[typing.Literal["large", "middle", "ogp", "player", "small"], str]): サムネイル
         counters (dict[typing.Literal["comment", "like", "mylist", "view"], str]): 各種カウンタ
-        genre (dict[typing.Literal["label", "key"], str]): 動画ジャンル
+        genre (typing.Optional[dict[typing.Literal["label", "key"], str]]): 動画ジャンル
     """
-    __slots__ = ("nicovideo_id", "title", "update", "description",
-                 "duration", "upload_date", "_rawdict")
+    __slots__ = ("nicovideo_id", "title", "update", "description", "genre",
+                 "duration", "upload_date", "thumbnails", "_rawdict", "counters")
     nicovideo_id: str
     _rawdict: apirawdicts.VideoAPIRawDicts.RawDict
     title: str
@@ -43,71 +44,16 @@ class APIResponse():
     upload_date: datetime.datetime
     thumbnails: dict[typing.Literal["large", "middle", "ogp", "player", "small"], str]
     counters: dict[typing.Literal["comment", "like", "mylist", "view"], str]
-    genre: dict[typing.Literal["label", "key"], str]
-
-    def __init__(self, video_id: str):
-        """
-        ニコニコのAPIサーバから動画情報を取得します。
-
-        Args:
-            video_id (str): 対象となる動画の、ニコニコ動画での動画ID (e.g. sm9)
-        Raises:
-            errors.ContentNotFoundError: 指定された動画が存在しなかった場合に送出。
-            errors.APIRequestError: ニコニコのAPIサーバへのリクエストに失敗した場合に送出。
-        Example:
-            >>> APIResponse("sm9")
-        """
-        super().__setattr__("nicovideo_id", video_id)
-
-        try:
-            with urllib.request.urlopen(url=NICOVIDEO_VIDEOPAGE_URL.format(video_id)) as res:
-                response_text = res.read()
-        except urllib.error.HTTPError as exc:
-            if exc.code == 404:
-                raise errors.ContentNotFoundError from exc
-            raise errors.APIRequestError from exc
-        except urllib.error.URLError as exc:
-            raise errors.APIRequestError from exc
-
-        soup = bs4.BeautifulSoup(markup=response_text, features="html.parser")
-        super().__setattr__("_rawdict", json5.loads(
-            str(object=soup.select(selector="#js-initial-watch-data")[0]["data-api-data"])
-        ))
-        if self._rawdict is None:
-            raise errors.APIRequestError("Invalid response from server.")
-
-        super().__setattr__("title", self._rawdict["video"]["title"])
-        super().__setattr__("update", datetime.datetime.now())
-        super().__setattr__("description", self._rawdict["video"]["description"])
-        super().__setattr__("duration", self._rawdict["video"]["duration"])
-        super().__setattr__("upload_date", datetime.datetime.fromisoformat(
-            self._rawdict["video"]["registeredAt"]
-        ))
-        super().__setattr__("thumbnail", {
-            "large": self._rawdict["video"]["thumbnail"]["largeUrl"],
-            "middle": self._rawdict["video"]["thumbnail"]["middleUrl"],
-            "ogp": self._rawdict["video"]["thumbnail"]["ogp"],
-            "player": self._rawdict["video"]["thumbnail"]["player"],
-            "small": self._rawdict["video"]["thumbnail"]["url"]
-        })
-        super().__setattr__("counters", {
-            "comment": self._rawdict["video"]["count"]["comment"],
-            "like": self._rawdict["video"]["count"]["like"],
-            "mylist": self._rawdict["video"]["count"]["mylist"],
-            "view": self._rawdict["video"]["count"]["view"]
-        })
-        super().__setattr__("genre", {
-            "label": self._rawdict["genre"]["label"],
-            "key": self._rawdict["genre"]["key"]
-        })
+    genre: typing.Optional[dict[typing.Literal["label", "key"], str]]
 
     @property
-    def uploader(self) -> user.APIResponse:
+    def uploader(self) -> user._APIResponse:
         """動画の投稿者を取得する。"""
-        return user.APIResponse(user_id=int(self._rawdict["owner"]["id"]))
+        return user.get_metadata(user_id=int(self._rawdict["owner"]["id"]))
 
-    @functools.cached_property
-    def cached_uploader(self) -> user.APIResponse:
+    @property
+    @functools.cache
+    def cached_uploader(self) -> user._APIResponse:
         """動画の投稿者を取得する。（初回にキャッシュするので最新ではない可能性がある。）"""
         return self.uploader
 
@@ -123,3 +69,64 @@ class APIResponse():
         return int("".join(
             [str(object=ord(character)) for character in self.nicovideo_id]
         ))
+
+APIResponse = typing.NewType("APIResponse", _APIResponse)
+
+def get_metadata(video_id: str) -> APIResponse:
+    """
+    ニコニコのAPIサーバから動画情報を取得します。
+
+    Args:
+        video_id (str): 対象となる動画の、ニコニコ動画での動画ID (e.g. sm9)
+    Raises:
+        errors.ContentNotFoundError: 指定された動画が存在しなかった場合に送出。
+        errors.APIRequestError: ニコニコのAPIサーバへのリクエストに失敗した場合に送出。
+    Example:
+        >>> get_metadata("sm9")
+    """
+    gotapiresponse = _APIResponse()
+    object.__setattr__(gotapiresponse, "nicovideo_id", video_id)
+
+    try:
+        with urllib.request.urlopen(url=NICOVIDEO_VIDEOPAGE_URL.format(video_id)) as res:
+            response_text = res.read()
+    except urllib.error.HTTPError as exc:
+        if exc.code == 404:
+            raise errors.ContentNotFoundError from exc
+        raise errors.APIRequestError from exc
+    except urllib.error.URLError as exc:
+        raise errors.APIRequestError from exc
+
+    object.__setattr__(gotapiresponse, "_rawdict", json5.loads(response_text)["data"]["response"])
+    if gotapiresponse._rawdict is None:
+        raise errors.APIRequestError("Invalid response from server.")
+
+    object.__setattr__(gotapiresponse, "title", gotapiresponse._rawdict["video"]["title"])
+    object.__setattr__(gotapiresponse, "update", datetime.datetime.now())
+    object.__setattr__(gotapiresponse, "description",
+                       gotapiresponse._rawdict["video"]["description"])
+    object.__setattr__(gotapiresponse, "duration", gotapiresponse._rawdict["video"]["duration"])
+    object.__setattr__(gotapiresponse, "upload_date", datetime.datetime.fromisoformat(
+        gotapiresponse._rawdict["video"]["registeredAt"]
+    ))
+    object.__setattr__(gotapiresponse, "thumbnails", {
+        "large": gotapiresponse._rawdict["video"]["thumbnail"]["largeUrl"],
+        "middle": gotapiresponse._rawdict["video"]["thumbnail"]["middleUrl"],
+        "ogp": gotapiresponse._rawdict["video"]["thumbnail"]["ogp"],
+        "player": gotapiresponse._rawdict["video"]["thumbnail"]["player"],
+        "small": gotapiresponse._rawdict["video"]["thumbnail"]["url"]
+    })
+    object.__setattr__(gotapiresponse, "counters", {
+        "comment": gotapiresponse._rawdict["video"]["count"]["comment"],
+        "like": gotapiresponse._rawdict["video"]["count"]["like"],
+        "mylist": gotapiresponse._rawdict["video"]["count"]["mylist"],
+        "view": gotapiresponse._rawdict["video"]["count"]["view"]
+    })
+    if gotapiresponse._rawdict["genre"]:
+        object.__setattr__(gotapiresponse, "genre", {
+            "label": gotapiresponse._rawdict["genre"]["label"],
+            "key": gotapiresponse._rawdict["genre"]["key"]
+        })
+    else:
+        object.__setattr__(gotapiresponse, "genre", None)
+    return APIResponse(gotapiresponse)

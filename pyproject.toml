@@ -20,9 +20,9 @@ packages = [{include = "nicovideo"}]
 include = ["LICENSE.md", "README.md"]
 
 [tool.poetry.dependencies]
-python = "^3.12"
+python = ">=3.11"
 json5 = "0.9.25"
-bs4 = "0.0.2"
+bs4 = "^0.0.2"
 
 
 [tool.poetry.group.dev.dependencies]

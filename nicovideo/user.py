@@ -2,6 +2,8 @@
 このモジュールは、ニコニコのユーザを扱います。
 
 """
+
+#pylint: disable=W0212
 from __future__ import annotations
 
 import typing
@@ -9,16 +11,16 @@ import urllib.error
 import urllib.request
 import collections.abc
 
-import bs4
 import json5
+import bs4
 
 from . import errors
 from . import apirawdicts
 from . import video
 
-NICOVIDEO_USERPAGE_URL = "https://www.nicovideo.jp/user/{}/video"
+NICOVIDEO_USERPAGE_URL = "https://www.nicovideo.jp/user/{}/video?responseType=json"
 
-class APIResponse():
+class _APIResponse():
     """
     ユーザの詳細 (e.g. ニックネーム, 投稿動画, etc.) を格納するクラスです。
 
@@ -39,6 +41,7 @@ class APIResponse():
     __slots__ = ("user_id", "nickname", "description", "subscription", "version", "followee",
                  "follower", "level", "exp", "sns", "cover", "icon", "_rawdict")
     user_id: int
+    _rawdict: apirawdicts.UserAPIRawDicts.RawDict
     nickname: str
     description: tuple[typing.Annotated[str, "HTML"], typing.Annotated[str, "Plain"]]
     subscription: typing.Literal["premium", "general"]
@@ -63,60 +66,6 @@ class APIResponse():
     ]
     icon: tuple[typing.Annotated[str, "小アイコン画像のURL"], typing.Annotated[str, "大アイコン画像のURL"]]
 
-    def __init__(self, user_id: int) -> None:
-        """
-        ニコニコのAPIサーバからユーザ情報を取得します。
-
-        Args:
-            user_id (int): 対象となるユーザの、ニコニコ動画でのID (e.g. 9003560)
-        Raises:
-            errors.ContentNotFoundError: 指定された動画が存在しなかった場合に送出。
-            errors.APIRequestError: ニコニコのAPIサーバへのリクエストに失敗した場合に送出。
-        Example:
-            >>> APIResponse(9003560)
-        """
-        try:
-            with urllib.request.urlopen(url=NICOVIDEO_USERPAGE_URL.format(user_id)) as res:
-                response_text = res.read()
-        except urllib.error.HTTPError as exc:
-            if exc.code == 404:
-                raise errors.ContentNotFoundError from exc
-            raise errors.APIRequestError from exc
-        except urllib.error.URLError as exc:
-            raise errors.APIRequestError from exc
-
-        soup = bs4.BeautifulSoup(markup=response_text, features="html.parser")
-        self._rawdict: apirawdicts.UserAPIRawDicts.RawDict
-        super().__setattr__("_rawdict", json5.loads(
-            str(object=soup.select("#js-initial-userpage-data")[0]["data-initial-data"])
-        ))
-        if self._rawdict is None:
-            raise errors.APIRequestError("Invalid response from server.")
-        rawdict_userdata = self._rawdict["state"]["userDetails"]["userDetails"]["user"]
-        self.nickname: str
-        super().__setattr__("nickname", rawdict_userdata["nickname"])
-        super().__setattr__("description", (rawdict_userdata["decoratedDescriptionHtml"],
-                                            rawdict_userdata["strippedDescription"]))
-        super().__setattr__("subscription",
-                            "premium" if rawdict_userdata["isPremium"] else "general")
-        super().__setattr__("version", rawdict_userdata["registeredVersion"])
-        super().__setattr__("followee", rawdict_userdata["foloweeCount"])
-        super().__setattr__("follower", rawdict_userdata["folowerCount"])
-        super().__setattr__("level", rawdict_userdata["userLevel"]["currentLevel"])
-        super().__setattr__("exp", rawdict_userdata["userLevel"]["currentLevelExperience"])
-        super().__setattr__("sns", frozenset(
-            [(sns["type"], sns["label"], sns["iconUrl"]) for sns in rawdict_userdata["sns"]]
-        ))
-        super().__setattr__("cover", (
-            rawdict_userdata["coverImage"]["pcUrl"],
-            rawdict_userdata["coverImage"]["ogpUrl"],
-            rawdict_userdata["coverImage"]["smartphoneUrl"]
-        ))
-        super().__setattr__("icon", (
-            rawdict_userdata["icons"]["small"],
-            rawdict_userdata["icons"]["large"]
-        ))
-
     @property
     def videolist(self) -> collections.abc.Generator[video.APIResponse, None, None]:
         """
@@ -126,9 +75,9 @@ class APIResponse():
         Yields:
             video.APIResponse: ユーザの投稿動画
         """
-        rawdict_videolist = self._rawdict["nvapi"]["data"][0]["items"]
+        rawdict_videolist = self._rawdict["nvapi"][0]["body"]["data"]["items"]
         for rawdict_video in rawdict_videolist:
-            yield video.APIResponse(rawdict_video["essential"]["id"])
+            yield video.get_metadata(rawdict_video["essential"]["id"])
 
     def __setattr__(self, _, name) -> typing.NoReturn:
         raise errors.FrozenInstanceError(f"cannot assign to field '{name}'")
@@ -140,3 +89,67 @@ class APIResponse():
         return self.nickname
     def __hash__(self) -> int:
         return self.user_id
+
+APIResponse = typing.NewType("APIResponse", _APIResponse)
+
+def get_metadata(user_id: int) -> APIResponse:
+    """
+    ニコニコのAPIサーバからユーザ情報を取得します。
+
+    Args:
+        user_id (int): 対象となるユーザの、ニコニコ動画でのID (e.g. 9003560)
+    Raises:
+        errors.ContentNotFoundError: 指定された動画が存在しなかった場合に送出。
+        errors.APIRequestError: ニコニコのAPIサーバへのリクエストに失敗した場合に送出。
+    Example:
+        >>> get_metadata(9003560)
+    """
+    gotapiresponse = _APIResponse()
+    try:
+        with urllib.request.urlopen(url=NICOVIDEO_USERPAGE_URL.format(user_id)) as res:
+            response_text = res.read()
+    except urllib.error.HTTPError as exc:
+        if exc.code == 404:
+            raise errors.ContentNotFoundError from exc
+        raise errors.APIRequestError from exc
+    except urllib.error.URLError as exc:
+        raise errors.APIRequestError from exc
+
+    soup = bs4.BeautifulSoup(markup=response_text, features="html.parser")
+    object.__setattr__(gotapiresponse, "_rawdict", json5.loads(
+        str(object=soup.select("#js-initial-userpage-data")[0]["data-initial-data"])
+    ))
+
+    if gotapiresponse._rawdict is None:
+        raise errors.APIRequestError("Invalid response from server.")
+    rawdict_userdata = gotapiresponse._rawdict["state"]["userDetails"]["userDetails"]["user"]
+    object.__setattr__(gotapiresponse, "user_id", user_id)
+    object.__setattr__(gotapiresponse, "nickname", rawdict_userdata["nickname"])
+    object.__setattr__(gotapiresponse, "description",
+                            (rawdict_userdata["decoratedDescriptionHtml"],
+                             rawdict_userdata["strippedDescription"])
+                      )
+    object.__setattr__(gotapiresponse, "subscription",
+                        "premium" if rawdict_userdata["isPremium"] else "general")
+    object.__setattr__(gotapiresponse, "version", rawdict_userdata["registeredVersion"])
+    object.__setattr__(gotapiresponse, "followee", rawdict_userdata["followeeCount"])
+    object.__setattr__(gotapiresponse, "follower", rawdict_userdata["followerCount"])
+    object.__setattr__(gotapiresponse, "level", rawdict_userdata["userLevel"]["currentLevel"])
+    object.__setattr__(gotapiresponse, "exp",
+                       rawdict_userdata["userLevel"]["currentLevelExperience"])
+    object.__setattr__(gotapiresponse, "sns", frozenset(
+        [(sns["type"], sns["label"], sns["iconUrl"]) for sns in rawdict_userdata["sns"]]
+    ))
+    if rawdict_userdata["coverImage"]:
+        object.__setattr__(gotapiresponse, "cover", (
+            rawdict_userdata["coverImage"]["pcUrl"],
+            rawdict_userdata["coverImage"]["ogpUrl"],
+            rawdict_userdata["coverImage"]["smartphoneUrl"]
+        ))
+    else:
+        object.__setattr__(gotapiresponse, "cover", None)
+    object.__setattr__(gotapiresponse, "icon", (
+        rawdict_userdata["icons"]["small"],
+        rawdict_userdata["icons"]["large"]
+    ))
+    return APIResponse(gotapiresponse)
