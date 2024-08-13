@@ -33,184 +33,41 @@ Bases: `AttributeError`
 
 このモジュールは、ニコニコのユーザを扱います。
 
-### *class* nicovideo.user.APIResponse(user_id: int)
+### nicovideo.user.get_metadata(user_id: int)
 
-Bases: `object`
+ニコニコのAPIサーバからユーザ情報を取得します。
 
-ユーザの詳細 (e.g. ニックネーム, 投稿動画, etc.) を格納するクラスです。
+* **Parameters:**
+  **user_id** (*int*) – 対象となるユーザの、ニコニコ動画でのID (e.g. 9003560)
+* **Raises:**
+  * [**errors.ContentNotFoundError**](#nicovideo.errors.ContentNotFoundError) – 指定された動画が存在しなかった場合に送出。
+  * [**errors.APIRequestError**](#nicovideo.errors.APIRequestError) – ニコニコのAPIサーバへのリクエストに失敗した場合に送出。
 
-#### user_id
+### Example
 
-ニコニコ動画でのID (e.g. 9003560)
-
-* **Type:**
-  int
-
-#### nickname
-
-ニックネーム
-
-* **Type:**
-  str
-
-#### description
-
-ユーザ説明欄
-
-* **Type:**
-  tuple[*Annoatated*[str, “HTML”], *Annotated*[str, “Plain”]]
-
-#### subscription
-
-会員種別 (プレミアム会員もしくは一般会員)
-
-* **Type:**
-  *Literal*[“premium”, “general”]
-
-#### version
-
-登録時のニコニコのバージョン (e.g. eR)
-
-* **Type:**
-  str
-
-#### followee
-
-フォロイー数 (フォロー数)
-
-* **Type:**
-  int
-
-#### follower
-
-フォロワー数
-
-* **Type:**
-  int
-
-#### level
-
-ユーザレベル
-
-* **Type:**
-  int
-
-#### exp
-
-ユーザEXP
-
-* **Type:**
-  int
-
-#### sns
-
-連携されているSNS
-
-* **Type:**
-  frozenset[tuple[*Annotated*[str, “SNSの名前”], *Annotated*[str, “SNSのユーザ名”], *Annotated*[str, “SNSのアイコン (PNG)”]]]
-
-#### cover
-
-ユーザのカバー画像
-
-* **Type:**
-  *Optional*[tuple[*Annotated*[str, “PC用画像のURL”], *Annotated*[str, “OGP用画像のURL”], *Annotated*[str, “SP用画像のURL”]]]
-
-#### icon
-
-ユーザアイコン
-
-* **Type:**
-  tuple[*Annotated*[str, “小アイコン画像のURL”], *Annotated*[str, “大アイコン画像のURL”]]
-
-#### *property* videolist *: Generator[[APIResponse](#nicovideo.video.APIResponse), None, None]*
-
-ユーザが投稿した動画を一つずつ、video.APIResponseにしてからyieldします。
-nextごとにニコニコ動画でのAPIリクエストが発生するため、注意してください。
-
-* **Yields:**
-  *video.APIResponse* – ユーザの投稿動画
+```pycon
+>>> get_metadata(9003560)
+```
 
 ## nicovideo.video module
 
 このモジュールは、ニコニコの動画を取り扱います。
 
-### *class* nicovideo.video.APIResponse(video_id: str)
+### nicovideo.video.get_metadata(video_id: str)
 
-Bases: `object`
+ニコニコのAPIサーバから動画情報を取得します。
 
-動画の詳細（e.g. タイトル, 概要, etc.）を格納するクラスです。
+* **Parameters:**
+  **video_id** (*str*) – 対象となる動画の、ニコニコ動画での動画ID (e.g. sm9)
+* **Raises:**
+  * [**errors.ContentNotFoundError**](#nicovideo.errors.ContentNotFoundError) – 指定された動画が存在しなかった場合に送出。
+  * [**errors.APIRequestError**](#nicovideo.errors.APIRequestError) – ニコニコのAPIサーバへのリクエストに失敗した場合に送出。
 
-#### nicovideo_id
+### Example
 
-ニコニコ動画での動画ID (e.g. sm9)
-
-* **Type:**
-  str
-
-#### title
-
-動画のタイトル
-
-* **Type:**
-  str
-
-#### update
-
-このオブジェクトに格納されている情報の取得時刻
-
-* **Type:**
-  datetime.datetime
-
-#### description
-
-動画説明欄
-
-* **Type:**
-  str
-
-#### duration
-
-動画の長さ
-
-* **Type:**
-  str
-
-#### upload_date
-
-動画の投稿時間
-
-* **Type:**
-  datetime.datetime
-
-#### thumbnail
-
-サムネイル
-
-* **Type:**
-  dict[*Literal*[“large”, “middle”, “ogp”, “player”, “small”], str]
-
-#### counters
-
-各種カウンタ
-
-* **Type:**
-  dict[*Literal*[“comment”, “like”, “mylist”, “view”], str]
-
-#### genre
-
-動画ジャンル
-
-* **Type:**
-  dict[*Literal*[“label”, “key”], str]
-
-#### *property* cached_uploader *: [APIResponse](#nicovideo.user.APIResponse)*
-
-動画の投稿者を取得する。（初回にキャッシュするので最新ではない可能性がある。）
-
-#### *property* uploader *: [APIResponse](#nicovideo.user.APIResponse)*
-
-動画の投稿者を取得する。
+```pycon
+>>> get_metadata("sm9")
+```
 
 ## Module contents
 

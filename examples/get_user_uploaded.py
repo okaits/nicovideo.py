@@ -11,7 +11,7 @@ def main() -> None:
     parser.add_argument("userid", help="対象ユーザのID (数字)")
     args = parser.parse_args()
 
-    for video in nicovideo.user.APIResponse(user_id=int(args.userid)).videolist:
+    for video in nicovideo.user.get_metadata(user_id=int(args.userid)).videolist:
         print(str(object=video))
         time.sleep(5)
 

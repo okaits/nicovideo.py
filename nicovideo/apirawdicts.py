@@ -93,11 +93,11 @@ class UserAPIRawDicts():
         strippedDescription: str
         isPremium: bool
         registeredVersion: str
-        foloweeCount: int
-        folowerCount: int
+        followeeCount: int
+        followerCount: int
         userLevel: UserAPIRawDicts.UserDetailsUserDetailsUserUserLevel
         sns: list[UserAPIRawDicts.UserDetailsUserDetailsUserSNS]
-        coverImage: UserAPIRawDicts.UserDetailsUserDetailsUserCoverImage
+        coverImage: typing.Optional[UserAPIRawDicts.UserDetailsUserDetailsUserCoverImage]
         icons: UserAPIRawDicts.UserDetailsUserDetailsUserIcons
     class UserDetailsUserDetails(typing.TypedDict):
         user: UserAPIRawDicts.UserDetailsUserDetailsUser
@@ -125,8 +125,10 @@ class UserAPIRawDicts():
     class NVAPIBodyData(typing.TypedDict):
         items: list[UserAPIRawDicts.NVAPIBodyDataItems]
     class NVAPIBody(typing.TypedDict):
-        data: list[UserAPIRawDicts.NVAPIBodyData]
+        data: UserAPIRawDicts.NVAPIBodyData
+    class NVAPI(typing.TypedDict):
+        body: UserAPIRawDicts.NVAPIBody
     class RawDict(typing.TypedDict):
         """RawDict TypedDict: User._rawdictに格納されるdictの型ヒント"""
         state: UserAPIRawDicts.State
-        nvapi: UserAPIRawDicts.NVAPIBody
+        nvapi: list[UserAPIRawDicts.NVAPI]
