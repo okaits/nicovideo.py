@@ -183,6 +183,27 @@ Bases: `object`
 * **Type:**
   datetime.datetime
 
+#### thumbnail
+
+サムネイル
+
+* **Type:**
+  dict[*Literal*[“large”, “middle”, “ogp”, “player”, “small”], str]
+
+#### counters
+
+各種カウンタ
+
+* **Type:**
+  dict[*Literal*[“comment”, “like”, “mylist”, “view”], str]
+
+#### genre
+
+動画ジャンル
+
+* **Type:**
+  dict[*Literal*[“label”, “key”], str]
+
 #### *property* cached_uploader *: [APIResponse](#nicovideo.user.APIResponse)*
 
 動画の投稿者を取得する。（初回にキャッシュするので最新ではない可能性がある。）
