@@ -66,6 +66,21 @@ class _APIResponse():
     ]
     icon: tuple[typing.Annotated[str, "小アイコン画像のURL"], typing.Annotated[str, "大アイコン画像のURL"]]
 
+    def _videolist_nextpage(self, page: int) -> list[apirawdicts.UserAPIRawDicts.NVAPIBodyDataItems]:
+        """
+        ユーザーが投稿した動画の一覧ページが次のページに続いている時に、その次のページのときの動画一覧を取得します。
+        """
+        nextpage_url = NICOVIDEO_USERPAGE_URL.format(str(self.user_id)) + f"&page={page}"
+        with urllib.request.urlopen(nextpage_url) as response:
+            response_text = response.read()
+
+        soup = bs4.BeautifulSoup(markup=response_text, features="html.parser")
+        rawdict = json5.loads(
+            str(object=soup.select("#js-initial-userpage-data")[0]["data-initial-data"])
+        )
+        assert rawdict
+        return rawdict["nvapi"][0]["body"]["data"]["items"]
+
     @property
     def videolist(self) -> collections.abc.Generator[video.APIResponse, None, None]:
         """
@@ -75,9 +90,17 @@ class _APIResponse():
         Yields:
             video.APIResponse: ユーザの投稿動画
         """
+        video_count = 0
+        page_count = 1
         rawdict_videolist = self._rawdict["nvapi"][0]["body"]["data"]["items"]
-        for rawdict_video in rawdict_videolist:
-            yield video.get_metadata(rawdict_video["essential"]["id"])
+        while True:
+            for rawdict_video in rawdict_videolist:
+                video_count += 1
+                yield video.get_metadata(rawdict_video["essential"]["id"])
+            if self._rawdict["nvapi"][0]["body"]["data"]["totalCount"] <= video_count:
+                break
+            page_count += 1
+            rawdict_videolist = self._videolist_nextpage(page=page_count)
 
     def __setattr__(self, _, name) -> typing.NoReturn:
         raise errors.FrozenInstanceError(f"cannot assign to field '{name}'")

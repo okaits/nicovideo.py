@@ -124,6 +124,7 @@ class UserAPIRawDicts():
         series: UserAPIRawDicts.NVAPIBodyDataItemsSeries
     class NVAPIBodyData(typing.TypedDict):
         items: list[UserAPIRawDicts.NVAPIBodyDataItems]
+        totalCount: int
     class NVAPIBody(typing.TypedDict):
         data: UserAPIRawDicts.NVAPIBodyData
     class NVAPI(typing.TypedDict):

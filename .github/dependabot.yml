@@ -8,3 +8,4 @@ updates:
       - "okaits"
     assignees:
       - "okaits"
+    target-branch: "dev"
