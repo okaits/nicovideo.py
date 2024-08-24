@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nicovideo.py"
-version = "4.1.0"
+version = "4.1.1"
 description = "ニコニコ動画のAPIを使用して、動画や投稿者などの情報を取得するライブラリです。"
 license = "MIT"
 authors = ["okaits7534 <okaits@okaits7534.net>"]
