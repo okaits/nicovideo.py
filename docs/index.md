@@ -1,5 +1,9 @@
 
-# Welcome to nicovideo’s documentation!
+# nicovideo documentation
+
+Add your content using `reStructuredText` syntax. See the
+[reStructuredText](https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html)
+documentation for details.
 
 # Contents:
 
@@ -15,9 +19,3 @@
   * [nicovideo.video module](nicovideo.md#module-nicovideo.video)
     * [`get_metadata()`](nicovideo.md#nicovideo.video.get_metadata)
   * [Module contents](nicovideo.md#module-nicovideo)
-
-# Indices and tables
-
-* [Index](genindex.md)
-* [Module Index](py-modindex.md)
-* [Search Page](search.md)
