@@ -20,7 +20,7 @@ from . import video
 
 NICOVIDEO_USERPAGE_URL = "https://www.nicovideo.jp/user/{}/video?responseType=json"
 
-class _APIResponse():
+class APIResponse():
     """
     ユーザの詳細 (e.g. ニックネーム, 投稿動画, etc.) を格納するクラスです。
 
@@ -82,7 +82,7 @@ class _APIResponse():
         return rawdict["nvapi"][0]["body"]["data"]["items"]
 
     @property
-    def videolist(self) -> collections.abc.Generator[video.APIResponse, None, None]:
+    def videolist(self) -> collections.abc.Generator[video.APIResponseFromServer, None, None]:
         """
         ユーザが投稿した動画を一つずつ、video.APIResponseにしてからyieldします。
         nextごとにニコニコ動画でのAPIリクエストが発生するため、注意してください。
@@ -107,15 +107,15 @@ class _APIResponse():
     def __delattr__(self, name) -> typing.NoReturn:
         raise errors.FrozenInstanceError(f"cannot delete field {name}")
     def __repr__(self) -> str:
-        return f"user.APIResponse(user_id={self.user_id})"
+        return f"<nicovideo.py user.APIResponse: {self.user_id}>"
     def __str__(self) -> str:
         return self.nickname
     def __hash__(self) -> int:
         return self.user_id
 
-APIResponse = typing.NewType("APIResponse", _APIResponse)
+APIResponseFromServer = typing.NewType("APIResponseFromServer", APIResponse)
 
-def get_metadata(user_id: int) -> APIResponse:
+def get_metadata(user_id: int) -> APIResponseFromServer:
     """
     ニコニコのAPIサーバからユーザ情報を取得します。
 
@@ -129,7 +129,7 @@ def get_metadata(user_id: int) -> APIResponse:
     Example:
         >>> get_metadata(9003560)
     """
-    gotapiresponse = _APIResponse()
+    gotapiresponse = APIResponse()
     try:
         with urllib.request.urlopen(url=NICOVIDEO_USERPAGE_URL.format(user_id)) as res:
             response_text = res.read()
@@ -177,4 +177,4 @@ def get_metadata(user_id: int) -> APIResponse:
         rawdict_userdata["icons"]["small"],
         rawdict_userdata["icons"]["large"]
     ))
-    return APIResponse(gotapiresponse)
+    return APIResponseFromServer(gotapiresponse)

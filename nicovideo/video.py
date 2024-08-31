@@ -18,7 +18,7 @@ from . import apirawdicts, errors, user
 
 NICOVIDEO_VIDEOPAGE_URL = "https://www.nicovideo.jp/watch/{}?responseType=json"
 
-class _APIResponse():
+class APIResponse():
     """
     動画の詳細（e.g. タイトル, 概要, etc.）を格納するクラスです。
     
@@ -47,13 +47,13 @@ class _APIResponse():
     genre: typing.Optional[dict[typing.Literal["label", "key"], str]]
 
     @property
-    def uploader(self) -> user._APIResponse:
+    def uploader(self) -> user.APIResponse:
         """動画の投稿者を取得する。"""
         return user.get_metadata(user_id=int(self._rawdict["owner"]["id"]))
 
     @property
     @functools.cache
-    def cached_uploader(self) -> user._APIResponse:
+    def cached_uploader(self) -> user.APIResponse:
         """動画の投稿者を取得する。（初回にキャッシュするので最新ではない可能性がある。）"""
         return self.uploader
 
@@ -62,7 +62,7 @@ class _APIResponse():
     def __delattr__(self, name) -> typing.NoReturn:
         raise errors.FrozenInstanceError(f"cannot delete field {name}")
     def __repr__(self) -> str:
-        return f"video.APIResponse(video_id={self.nicovideo_id})"
+        return f"<nicovideo.py video.APIResponse: {self.nicovideo_id}>"
     def __str__(self) -> str:
         return self.title
     def __hash__(self) -> int:
@@ -70,9 +70,9 @@ class _APIResponse():
             [str(object=ord(character)) for character in self.nicovideo_id]
         ))
 
-APIResponse = typing.NewType("APIResponse", _APIResponse)
+APIResponseFromServer = typing.NewType("APIResponseFromServer", APIResponse)
 
-def get_metadata(video_id: str) -> APIResponse:
+def get_metadata(video_id: str) -> APIResponseFromServer:
     """
     ニコニコのAPIサーバから動画情報を取得します。
 
@@ -86,7 +86,7 @@ def get_metadata(video_id: str) -> APIResponse:
     Example:
         >>> get_metadata("sm9")
     """
-    gotapiresponse = _APIResponse()
+    gotapiresponse = APIResponse()
     object.__setattr__(gotapiresponse, "nicovideo_id", video_id)
 
     try:
@@ -131,4 +131,4 @@ def get_metadata(video_id: str) -> APIResponse:
         })
     else:
         object.__setattr__(gotapiresponse, "genre", None)
-    return APIResponse(gotapiresponse)
+    return APIResponseFromServer(gotapiresponse)

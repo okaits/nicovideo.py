@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nicovideo.py"
-version = "4.1.1"
+version = "4.1.2"
 description = "ニコニコ動画のAPIを使用して、動画や投稿者などの情報を取得するライブラリです。"
 license = "MIT"
 authors = ["okaits7534 <okaits@okaits7534.net>"]
@@ -20,7 +20,7 @@ packages = [{include = "nicovideo"}]
 include = ["LICENSE.md", "README.md"]
 
 [tool.poetry.dependencies]
-python = ">=3.11"
+python = ">=3.9"
 json5 = "0.9.25"
 bs4 = "^0.0.2"
 
