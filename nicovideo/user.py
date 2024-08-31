@@ -107,7 +107,7 @@ class _APIResponse():
     def __delattr__(self, name) -> typing.NoReturn:
         raise errors.FrozenInstanceError(f"cannot delete field {name}")
     def __repr__(self) -> str:
-        return f"user.APIResponse(user_id={self.user_id})"
+        return f"<nicovideo.py user.APIResponse: {self.user_id}>"
     def __str__(self) -> str:
         return self.nickname
     def __hash__(self) -> int:
