@@ -25,16 +25,17 @@ class APIResponse():
     Attributes:
         nicovideo_id (str): ニコニコ動画での動画ID (e.g. sm9)
         title (str): 動画のタイトル
-        update (datetime.datetime): このオブジェクトに格納されている情報の取得時刻
+        update (datetime.datetime): このインスタンスに格納されている情報の取得時刻
         description (str): 動画説明欄
         duration (str): 動画の長さ
         upload_date (datetime.datetime): 動画の投稿時間
         thumbnail (dict[typing.Literal["large", "middle", "ogp", "player", "small"], str]): サムネイル
         counters (dict[typing.Literal["comment", "like", "mylist", "view"], str]): 各種カウンタ
         genre (typing.Optional[dict[typing.Literal["label", "key"], str]]): 動画ジャンル
+        tags (set[tuple[typing.Annotated[str, "タグ名"], typing.Annotated[bool, "タグロック"]]]): 動画のタグ
     """
     __slots__ = ("nicovideo_id", "title", "update", "description", "genre",
-                 "duration", "upload_date", "thumbnails", "_rawdict", "counters")
+                 "duration", "upload_date", "thumbnails", "_rawdict", "counters", "tags")
     nicovideo_id: str
     _rawdict: apirawdicts.VideoAPIRawDicts.RawDict
     title: str
@@ -45,6 +46,7 @@ class APIResponse():
     thumbnails: dict[typing.Literal["large", "middle", "ogp", "player", "small"], str]
     counters: dict[typing.Literal["comment", "like", "mylist", "view"], str]
     genre: typing.Optional[dict[typing.Literal["label", "key"], str]]
+    tags: set[tuple[typing.Annotated[str, "タグ名"], typing.Annotated[bool, "タグロック"]]]
 
     @property
     def uploader(self) -> user.APIResponse:
@@ -124,6 +126,7 @@ def get_metadata(video_id: str) -> APIResponseFromServer:
         "mylist": gotapiresponse._rawdict["video"]["count"]["mylist"],
         "view": gotapiresponse._rawdict["video"]["count"]["view"]
     })
+
     if gotapiresponse._rawdict["genre"]:
         object.__setattr__(gotapiresponse, "genre", {
             "label": gotapiresponse._rawdict["genre"]["label"],
@@ -131,4 +134,9 @@ def get_metadata(video_id: str) -> APIResponseFromServer:
         })
     else:
         object.__setattr__(gotapiresponse, "genre", None)
+
+    object.__setattr__(gotapiresponse, "tags", {
+        (tag["name"], tag["isLocked"]) for tag in gotapiresponse._rawdict["tag"]["items"]
+    })
+
     return APIResponseFromServer(gotapiresponse)

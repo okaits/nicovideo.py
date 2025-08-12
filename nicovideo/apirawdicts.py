@@ -30,6 +30,9 @@ class VideoAPIRawDicts():
         thumbnail: VideoAPIRawDicts.VideoThumbnail
     class TagItems(typing.TypedDict):
         name: str
+        isCategory: bool
+        isCategoryCandidate: bool
+        isNicodicArticleExists: bool
         isLocked: bool
     class Tag(typing.TypedDict):
         items: list[VideoAPIRawDicts.TagItems]
