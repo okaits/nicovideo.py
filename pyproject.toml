@@ -21,7 +21,7 @@ include = ["LICENSE.md", "README.md"]
 
 [tool.poetry.dependencies]
 python = ">=3.9"
-json5 = "0.9.25"
+json5 = "0.12.1"
 bs4 = "^0.0.2"
 
 
